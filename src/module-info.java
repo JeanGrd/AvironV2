@@ -1,9 +1,0 @@
-/**
- * 
- */
-/**
- * @author PaulineVarin
- *
- */
-module repositorytournoiaviron {
-}
