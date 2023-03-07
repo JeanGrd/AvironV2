@@ -24,8 +24,8 @@ import javafx.stage.Stage;
  * @author PaulineVarin
  */
 public class CreateTeamView {
-    public static int nombreEquipes = 8;
-    private static int nombreParticipantsEquipe = 8 ;
+    public static int nombreEquipes = 4;
+    private static int nombreParticipantsEquipe = 2 ;
     public static int equipeCourante = 1 ; 
     
     //Labels
