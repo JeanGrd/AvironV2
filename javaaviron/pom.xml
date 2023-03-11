@@ -16,6 +16,13 @@
     <artifactId>javafx-controls</artifactId>
     <version>19</version>
   </dependency>
+  
+  <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-fxml</artifactId>
+    <version>19</version>
+  </dependency>
+ 
 </dependencies>
   
  <build>
@@ -25,7 +32,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-            <mainClass>javaprojetaviron.view.MainProjetView</mainClass>
+            <mainClass>javaprojetaviron.view.ApplicationView</mainClass>
         </configuration>
     </plugin>
     

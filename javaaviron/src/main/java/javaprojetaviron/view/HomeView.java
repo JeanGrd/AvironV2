@@ -9,12 +9,16 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javaprojetaviron.controller.ControllerAppli;
 
 /**
  * La classe HomeView représente l'interface d'accueil de l'application 
  * @author PaulineVarin
  */
 public class HomeView {
+    //Controlleur à transmettre
+    private ControllerAppli controlleurVue ; 
+    
     //Bouttons
     private Button suivantB = new Button("Suivant") ;
     private Button chargerB = new Button("Charger") ; 
@@ -26,7 +30,16 @@ public class HomeView {
     private VBox rootV = new VBox(10) ;
     private HBox rootH = new HBox(10) ; 
     private VBox root = new VBox(10) ; 
-   
+    
+    
+
+    public void setControlleurVue(ControllerAppli controlleurVue) {
+        this.controlleurVue = controlleurVue;
+    }
+    
+    
+    
+    
     
     /**
      * Creation de la scene avec l'initialisation de tout les composants et le rajout a la scene
@@ -43,6 +56,7 @@ public class HomeView {
                 
                 //Mise en place de la scene suivante
                 CreateTournoiView tournoiCreateView = new CreateTournoiView() ; 
+                tournoiCreateView.setControlleurVue(controlleurVue);
                 Scene sceneCreateTournoi = tournoiCreateView.creationScene() ; 
                 stageP.setScene(sceneCreateTournoi);
             }

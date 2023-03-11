@@ -1,3 +1,4 @@
+package javaprojetaviron.model ; 
 import java.util.ArrayList;
 
 public class Embarcation{

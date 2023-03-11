@@ -1,18 +1,15 @@
 package javaprojetaviron.view;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javaprojetaviron.controller.ControllerAppli;
 
 /**
  * La classe CreateTeamView représente l'interface qui permet d'initialiser chaque equipe
@@ -23,6 +20,9 @@ public class CreateTeamView {
     public static int nombreEquipes = 4;
     private static int nombreParticipantsEquipe = 1 ;
     public static int equipeCourante = 1 ; 
+    
+    //Récupération données
+    private ControllerAppli controlleurVue ; 
     
     //Labels
     private Label l = new Label() ;  
@@ -37,13 +37,16 @@ public class CreateTeamView {
     private Button suivantB = new Button("Suivant") ;
     private Button retourB = new Button("Retour") ; 
     
-    
     //Scenes
     private VBox rootTitre = new VBox(10) ;
     private HBox rootNomEquipe = new HBox(10) ; 
     private HBox rootBouton = new HBox(10) ; 
     private VBox rootInfosEquipe = new VBox(10) ;
     private VBox root = new VBox(10) ; 
+    
+    public void setControlleurVue(ControllerAppli c) {
+        this.controlleurVue = c;
+    }
     
     
     
@@ -64,6 +67,8 @@ public class CreateTeamView {
         this.suivantB.setOnAction(new EventHandler<ActionEvent> () {
             public void handle(ActionEvent e) {
                 if(CreateTeamView.equipeCourante < CreateTeamView.nombreEquipes) {
+                    //Envoie des informations au controlleur
+                    
                     CreateTeamView.equipeCourante++ ; 
                     System.out.println(CreateTeamView.equipeCourante);
                     
@@ -71,7 +76,9 @@ public class CreateTeamView {
                     Stage stageP =  (Stage) s1.getWindow() ; 
                 
                     //Mise en place de la même scène pour une autre équipe autant de fois que d'équipes existantes
+                    //et liaison avec le controlleur 
                     CreateTeamView teamCreateView = new CreateTeamView() ; 
+                    teamCreateView.setControlleurVue(controlleurVue);
                     Scene sceneCreateTeam = teamCreateView.creationScene() ; 
                     stageP.setScene(sceneCreateTeam);
                 } else {
@@ -161,6 +168,12 @@ public class CreateTeamView {
         this.root.getChildren().addAll(rootTitre,rootNomEquipe,rootInfosEquipe, rootBouton) ; 
         Scene scene = new Scene(root, 1000,600); 
         
+        //Liaison de la scene et du controleur
+        this.controlleurVue.setVueTournoi(scene);
+        
+        
+        //Test du bon fonctionnement
+        this.controlleurVue.listInfos() ; 
         return scene ; 
     }
     
