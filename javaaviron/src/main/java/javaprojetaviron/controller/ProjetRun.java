@@ -1,4 +1,4 @@
-package javaprojetaviron;
+package javaprojetaviron.controller;
 
 import javaprojetaviron.view.ApplicationMain;
 
