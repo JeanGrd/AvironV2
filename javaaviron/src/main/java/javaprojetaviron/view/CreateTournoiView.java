@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package javaprojetaviron.view;
 
 import java.util.ArrayList;
@@ -22,7 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- *
+ *  La classe CreationTournoiView représente l'interface qui permet d'initialiser le tournoi 
  * @author PaulineVarin
  */
 public class CreateTournoiView { 
@@ -44,8 +41,12 @@ public class CreateTournoiView {
     private HBox rootBouton = new HBox(10) ; 
     private VBox rootBox =  new VBox(10) ;
     private VBox root = new VBox(10) ;
-      
-   
+    
+    /**
+     * Creation de la scene avec l'initialisation de tout les composants et le rajout a la scene
+     * @return la scene construite qui est rajouté au stage principal
+     */
+    
     public Scene creationScene() {
         //Création des différents éléments 
         //Mise en place du label pour le titre

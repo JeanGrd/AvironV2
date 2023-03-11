@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package javaprojetaviron.view;
 
 import javafx.event.ActionEvent;
@@ -15,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- *
+ * La classe HomeView représente l'interface d'accueil de l'application 
  * @author PaulineVarin
  */
 public class HomeView {
@@ -31,6 +27,11 @@ public class HomeView {
     private HBox rootH = new HBox(10) ; 
     private VBox root = new VBox(10) ; 
    
+    
+    /**
+     * Creation de la scene avec l'initialisation de tout les composants et le rajout a la scene
+     * @return la scene construite qui est affiché dans le stage principal
+     */
     public Scene creationScene() {
         //Création des différents éléments 
         this.l.setText("Gestion des tournois d'Aviron");

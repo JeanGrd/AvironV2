@@ -1,9 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package javaprojetaviron.view;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -20,12 +15,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- *
+ * La classe CreateTeamView représente l'interface qui permet d'initialiser chaque equipe
  * @author PaulineVarin
  */
+
 public class CreateTeamView {
     public static int nombreEquipes = 4;
-    private static int nombreParticipantsEquipe = 3 ;
+    private static int nombreParticipantsEquipe = 1 ;
     public static int equipeCourante = 1 ; 
     
     //Labels
@@ -41,8 +37,6 @@ public class CreateTeamView {
     private Button suivantB = new Button("Suivant") ;
     private Button retourB = new Button("Retour") ; 
     
-    //Table
-    private TableView tableInfosJoueurs = new TableView();
     
     //Scenes
     private VBox rootTitre = new VBox(10) ;
@@ -51,11 +45,20 @@ public class CreateTeamView {
     private VBox rootInfosEquipe = new VBox(10) ;
     private VBox root = new VBox(10) ; 
     
+    
+    
+    /**
+     * Permet de mettre à jour la valeur de l'attribut nbEquipe en fonction de celle reçu via le controlleur 
+     * @param nbEquipe int
+     */
     public void setNbEquipes(int nbEquipe) {
         CreateTeamView.nombreEquipes = nbEquipe;
     }
     
-    
+    /**
+     * Creation de la scene avec l'initialisation de tout les composants et le rajout a la scene
+     * @return la scene construite qui est rajouté au stage principal
+     */
     public Scene creationScene() {
         //Definiton du comportement des boutons
         this.suivantB.setOnAction(new EventHandler<ActionEvent> () {
@@ -107,9 +110,10 @@ public class CreateTeamView {
         //Mise en place de la scene pour le nom des membres de l'équipe
         
         //Définiton des labels
-        this.listLabels = new TextField[3] ;
+        this.listLabels = new TextField[4] ;
         String labelsString[]=new String[]{
             "Nom",
+            "Prenom",
             "Date de naissance",
             "Position",
             }; 
@@ -122,14 +126,14 @@ public class CreateTeamView {
         }
         
         //Creation des TextBox
-        int longeurListe = 3*CreateTeamView.nombreParticipantsEquipe ; 
+        int longeurListe = 4*CreateTeamView.nombreParticipantsEquipe ; 
         this.listTextBox = new TextField[longeurListe] ; 
         for(int i=0;i<this.listTextBox.length;i++) {
             this.listTextBox[i] = new TextField() ; 
         }
         
         //Mise en place de la structure de chaque élément pour la complétion des informations sur les membres de l'équipe
-        HBox infoJoueurLabel = new HBox(listLabels[0],listLabels[1],listLabels[2]) ; 
+        HBox infoJoueurLabel = new HBox(listLabels[0],listLabels[1],listLabels[2],listLabels[3]) ; 
         infoJoueurLabel.setAlignment(Pos.CENTER);
         
         //Liaison à la scène  pour les labels 
@@ -137,10 +141,10 @@ public class CreateTeamView {
         this.rootInfosEquipe.getChildren().addAll(infoJoueurLabel) ; 
         
         //Mise en place de la structure de chaque élement pour chaque participant
-        int nbFinBox = 2 ; 
+        int nbFinBox = 3 ; 
         
         for (int i=1;i<=CreateTeamView.nombreParticipantsEquipe;i++) {
-            HBox infoJoueur = new HBox(listTextBox[nbFinBox-2],listTextBox[nbFinBox-1],listTextBox[nbFinBox]) ; 
+            HBox infoJoueur = new HBox(listTextBox[nbFinBox-3],listTextBox[nbFinBox-2],listTextBox[nbFinBox-1],listTextBox[nbFinBox]) ; 
             infoJoueur.setAlignment(Pos.CENTER);
             //Liaison à la scène
             this.rootInfosEquipe.getChildren().add(infoJoueur) ; 
