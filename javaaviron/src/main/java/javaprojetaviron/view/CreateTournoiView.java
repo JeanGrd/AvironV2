@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package javaprojetaviron.view;
 
 import java.util.ArrayList;
@@ -9,23 +6,29 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javaprojetaviron.controller.ControllerAppli;
 
 /**
- *
+ *  La classe CreationTournoiView représente l'interface qui permet d'initialiser le tournoi 
  * @author PaulineVarin
  */
 public class CreateTournoiView { 
+    //Recuperation données
+    private ControllerAppli controlleurVue ; 
+    private ArrayList<String> listeInfos = new ArrayList<>() ; 
+    
     //Bouttons
     private Button suivantB = new Button("Suivant") ;
     private Button retourB = new Button("Retour") ; 
@@ -44,9 +47,36 @@ public class CreateTournoiView {
     private HBox rootBouton = new HBox(10) ; 
     private VBox rootBox =  new VBox(10) ;
     private VBox root = new VBox(10) ;
-      
-   
+    
+    
+    //Partie controller
+    public ControllerAppli getControlleurVue() {
+        return this.controlleurVue;
+    }
+
+    public void setControlleurVue(ControllerAppli c) {
+        this.controlleurVue = c;
+    }
+    
+    public void SendInformations () {
+        for (int i=0;i<this.listTextBox.length;i++) {
+           listeInfos.add((String)listTextBox[i].getText());
+        }
+        
+        for (int i=0;i<this.listComboBox.length;i++) {
+            listeInfos.add((String)listComboBox[i].getValue());
+        }
+        
+        this.controlleurVue.getInformationsToModel(listeInfos) ;
+    }
+    
+    /**
+     * Creation de la scene avec l'initialisation de tout les composants et le rajout a la scene
+     * Liaison de la scene avec le controlleur
+     * @return la scene construite qui est rajouté au stage principal
+     */ 
     public Scene creationScene() {
+
         //Création des différents éléments 
         //Mise en place du label pour le titre
         this.l.setText("Création de tournoi");
@@ -58,24 +88,35 @@ public class CreateTournoiView {
         //Definiton du comportement des boutons
         this.suivantB.setOnAction(new EventHandler<ActionEvent> () {
             public void handle(ActionEvent e) {
+                //Recuperation des infos concernant le stage
                 Scene s1 = ((Button)e.getSource()).getScene() ; 
                 Stage stageP =  (Stage) s1.getWindow() ; 
                 
-                //Mise en place de la scene suivante
+                //Envoi des données via le controlleur au model
+                //Le model devra vérifier que les données fournis sont ok
+                SendInformations();
+                
+                //En fonction du résultat de l'envoi on affiche une pop-up qui explique le problème
+                controlleurVue.erreurSaisieAlerte();
+                
+                
+
+                //Mise en place de la scene suivante    
                 CreateTeamView teamCreateView = new CreateTeamView() ; 
+                teamCreateView.setControlleurVue(controlleurVue);
                 Scene sceneCreateTeam = teamCreateView.creationScene() ; 
                 stageP.setScene(sceneCreateTeam);
             }
-            
         });
         
         this.retourB.setOnAction(new EventHandler<ActionEvent> () {
             public void handle(ActionEvent e) {
+                //Mise en place de la scene arrière
                 Scene s1 = ((Button)e.getSource()).getScene() ; 
                 Stage stageP =  (Stage) s1.getWindow() ; 
                 
-                //Mise en place de la scene arrière
                 HomeView tournoiHomeView = new HomeView() ; 
+                tournoiHomeView.setControlleurVue(controlleurVue);
                 Scene sceneHomeView = tournoiHomeView.creationScene() ; 
                 stageP.setScene(sceneHomeView);
             }
@@ -85,10 +126,7 @@ public class CreateTournoiView {
         //Creation de la scene des boutons
         this.rootBouton.setAlignment(Pos.CENTER);
         this.rootBouton.getChildren().addAll(retourB, suivantB) ; 
-        
-        
-        
-        
+
         //Mise en place du label pour chaque element de la page
         this.listLabels = new Label[7] ;
         String labelsString[]=new String[]{
@@ -104,9 +142,7 @@ public class CreateTournoiView {
         for(int i = 0; i < this.listLabels.length; i++) {
             this.listLabels[i]=new Label(labelsString[i]);
         }
-        
-       
-    
+
         //Creation des textBox
         String placeholderTextBox[]=new String[]{
             "Championnat",
@@ -118,8 +154,7 @@ public class CreateTournoiView {
         for(int i=0;i<this.listTextBox.length;i++) {
             this.listTextBox[i] = new TextField(placeholderTextBox[i]) ; 
         }
-        
-        
+             
         //Creation des ComboBox
         this.listComboBox = new ComboBox[4];
        
@@ -165,19 +200,18 @@ public class CreateTournoiView {
         HBox codeChampionnatBox = new HBox(listLabels[6],listTextBox[2]) ; 
         codeChampionnatBox.setAlignment(Pos.CENTER);
         
-        
         //Mise en place du corps 
         this.rootBox.setAlignment(Pos.CENTER);
         this.rootBox.getChildren().addAll(nomChampionnatBox, lieuChampionnatBox, typeChampionnatBox, nbEquipesChampionnatBox, nbMetresChampionnatBox, tempsChampionnatBox, codeChampionnatBox) ; 
-        
         
         //Creation de la scene principale  
         this.root.setAlignment(Pos.CENTER);
         this.root.getChildren().addAll(rootTitre,rootBox, rootBouton) ; 
         Scene scene = new Scene(root, 1000,600); 
-        
-        //Envoi des données via le controlleur au model
-        //Le model devra vérifier que les données fournis sont ok
+
+        //Liaison de la scene et du controleur
+        this.controlleurVue.setVueTournoi(scene);
+ 
         return scene ;
     }
     
