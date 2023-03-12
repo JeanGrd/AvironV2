@@ -1,3 +1,5 @@
+package javaprojetaviron.model;
+
 import java.util.ArrayList;
 
 public class Embarcation{
@@ -8,35 +10,36 @@ public class Embarcation{
 
     public Embarcation (String nom, int sizeEmbarcation){
         this.nom = nom;
-        this.placementParticipant = new ArrayList<>(sizeEmbarcation);
-        for (Participant p : this.placementParticipant) {
-            // this.placementParticipant.add();
+        this.placementParticipant = new ArrayList<Participant>(sizeEmbarcation);
+        for (int i = 0; i < sizeEmbarcation; i++) {
+            placementParticipant.add(null);
         }
     }
 
     public void positionnerParticipant (int indice, Participant participant) throws Exception{
-        if (placementParticipant.get(indice)!=null) {
-            if (indice!=0) {
-                placementParticipant.add(indice, participant);
-            }
-            else{
-                throw new Exception("L'indice 0 est la position du barreur");
-            }
+        if (indice == 0) {
+            throw new Exception("L'indice 0 est la position du barreur");
         }
-        else{
-            throw new Exception("Il y a deja un autre participant sur la place");
+        if (indice < placementParticipant.size()) {
+            if (placementParticipant.get(indice) != null) {
+                throw new Exception("Il y a déjà un autre participant sur la place");
+            } else {
+                placementParticipant.set(indice, participant);
+            }
+        } else {
+            throw new Exception("L'indice est en dehors de la plage autorisée pour cette liste");
         }
     }
 
     public void putBarreur(Participant participant){
-        placementParticipant.add(0, participant);
+        placementParticipant.set(0, participant);
     }
 
     public void removeBarreur(){
-        placementParticipant.remove(0);
+        placementParticipant.set(0, null);
     }
 
-    public boolean embarcaationIsOk(){
+    public boolean embarcationIsOk(){
         for(Participant p : placementParticipant)
         {
             if(p == null)
@@ -46,7 +49,4 @@ public class Embarcation{
         }
         return true;
     }
-
-
-
 }
