@@ -5,7 +5,7 @@ import java.util.Date;
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Tournoi test = new Tournoi("test","Narbonne", "FM4X+", 75, 4, TypeTournoi.COURSE_LIGNE);
+        Tournoi test = new Tournoi("test","Narbonne", "FM4X+", 75,5, 4, TypeTournoi.COURSE_LIGNE);
 
         Date date = new Date();
 
