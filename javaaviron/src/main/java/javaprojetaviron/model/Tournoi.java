@@ -1,5 +1,7 @@
 package javaprojetaviron.model;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -13,6 +15,7 @@ public class Tournoi{
     private final String lieu;
     private String code;
     private final float metres;
+    private final float intervalle ; 
     private boolean estBarre;
     private final TypeTournoi type;
     private Categorie categorie;
@@ -23,6 +26,10 @@ public class Tournoi{
 
     public int getNb_participants_par_embarcation() {
         return nb_participants_par_embarcation;
+    }
+    
+    public float getIntervalle() {
+        return this.intervalle ; 
     }
 
     public boolean isBarre() {
@@ -40,15 +47,18 @@ public class Tournoi{
     public int getNb_participants() {
         return nb_participants;
     }
+    
+    
 
     public Armature getArmature() {
         return armature;
     }
 
-    public Tournoi(String nom, String lieu, String code, float metres, int nb_participants , TypeTournoi type) throws Exception {
+    public Tournoi(String nom, String lieu, String code, float metres, float intervalleT,int nb_participants , TypeTournoi type) throws Exception {
         this.nom = nom;
         this.lieu = lieu;
         this.metres = metres;
+        this.intervalle = intervalleT ; 
         this.type = type;
         this.nb_participants = nb_participants;
         this.concourrants = new MaxSizeArrayList<>(this.nb_participants);
@@ -231,4 +241,19 @@ public class Tournoi{
                 ", concourrants=" + concourrants +
                 '}';
     }
+    
+    //Rajout méthodes pour le controlleur afin de créer ce qui est necéssaire
+    public void creationEmbarcationsWithParticipants (ArrayList<String> infosEmbarcations) {
+        Embarcation e = new Embarcation (infosEmbarcations.get(0), this.getNb_participants_par_embarcation()) ;
+        int departInfosP = 1 ; 
+        for (int i=1;i<this.getNb_participants_par_embarcation();i++) {
+            infosEmbarcations.get(departInfosP) ; 
+            infosEmbarcations.get(departInfosP+1) ;
+            infosEmbarcations.get(departInfosP+2) ; 
+        }
+        //Rajout à la liste des embarcations 
+        
+    }
+    
+    
 }

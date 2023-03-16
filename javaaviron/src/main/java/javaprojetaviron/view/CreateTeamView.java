@@ -1,4 +1,5 @@
 package javaprojetaviron.view;
+import java.util.ArrayList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -23,6 +24,7 @@ public class CreateTeamView {
     
     //Récupération données
     private ControllerAppli controlleurVue ; 
+    private ArrayList<String> listeInfos = new ArrayList<>() ; 
     
     //Labels
     private Label l = new Label() ;  
@@ -57,34 +59,53 @@ public class CreateTeamView {
         CreateTeamView.nombreEquipes = nbEquipe;
     }
     
+    public void setNbParticipantsEquipe(int nbParticipants) {
+        CreateTeamView.nombreParticipantsEquipe = nbParticipants;
+    }
+    
+    public void SendInformations () {
+        this.listeInfos.add(boxNomEquipe.getText()) ; 
+
+        for (int i=0;i<listTextBox.length;i++) {
+            this.listeInfos.add((listTextBox[i]).getText());
+        }
+        
+        this.controlleurVue.getInformationsToModelEquipes(this.listeInfos);
+    }
+    
+    
+    
     /**
      * Creation de la scene avec l'initialisation de tout les composants et le rajout a la scene
      * @return la scene construite qui est rajouté au stage principal
      */
     public Scene creationScene() {
+        //Initialisation des variables du nombre de participants et d'équipes
+        this.setNbEquipes(this.controlleurVue.getNbEquipes());
+        this.setNbParticipantsEquipe(this.controlleurVue.getNbParticipants_parEquipe());
+        
         //Definiton du comportement des boutons
         this.suivantB.setOnAction(new EventHandler<ActionEvent> () {
             public void handle(ActionEvent e) {
                 if(CreateTeamView.equipeCourante < CreateTeamView.nombreEquipes) {
                     //Envoie des informations au controlleur
-                    
+                    SendInformations() ; 
+
                     CreateTeamView.equipeCourante++ ; 
-                    System.out.println(CreateTeamView.equipeCourante);
-                    
-                    Scene s1 = ((Button)e.getSource()).getScene() ; 
-                    Stage stageP =  (Stage) s1.getWindow() ; 
                 
                     //Mise en place de la même scène pour une autre équipe autant de fois que d'équipes existantes
                     //et liaison avec le controlleur 
+                    Scene s1 = ((Button)e.getSource()).getScene() ; 
+                    Stage stageP =  (Stage) s1.getWindow() ; 
+                    
                     CreateTeamView teamCreateView = new CreateTeamView() ; 
                     teamCreateView.setControlleurVue(controlleurVue);
                     Scene sceneCreateTeam = teamCreateView.creationScene() ; 
                     stageP.setScene(sceneCreateTeam);
+                    
                 } else {
                     System.out.println("Passage scene suivante") ; 
                 }
-               
-                
             }
             
         });
@@ -162,7 +183,6 @@ public class CreateTeamView {
         
         
         //Test du bon fonctionnement
-        this.controlleurVue.listInfos() ; 
         return scene ; 
     }
     

@@ -11,6 +11,7 @@ package javaprojetaviron.view;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javaprojetaviron.controller.ControllerAppli;
+import javaprojetaviron.model.Tournoi;
 
 public class ApplicationMain extends Application{
     
@@ -19,6 +20,10 @@ public class ApplicationMain extends Application{
         
         //Initialisation de tout les modèles avant à vide et liaison avec le controlleur c sur le tournoi !!!!!
         ControllerAppli c = new ControllerAppli(); 
+        Tournoi t = null; 
+        c.setModel(t);
+        
+        //Mise en place de la vue 
         HomeView homescene = new HomeView() ; 
         homescene.setControlleurVue(c);
         primaryStage.setScene(homescene.creationScene());

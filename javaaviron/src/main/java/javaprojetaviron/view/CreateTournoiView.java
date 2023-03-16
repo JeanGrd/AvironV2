@@ -8,17 +8,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javaprojetaviron.controller.ControllerAppli;
+
 
 /**
  *  La classe CreationTournoiView représente l'interface qui permet d'initialiser le tournoi 
@@ -67,7 +65,7 @@ public class CreateTournoiView {
             listeInfos.add((String)listComboBox[i].getValue());
         }
         
-        this.controlleurVue.getInformationsToModel(listeInfos) ;
+        this.controlleurVue.getInformationsToModelTournoi(listeInfos) ;
     }
     
     /**
@@ -94,18 +92,17 @@ public class CreateTournoiView {
                 
                 //Envoi des données via le controlleur au model
                 //Le model devra vérifier que les données fournis sont ok
+                //En fonction du résultat de l'envoi on affiche une pop-up qui explique le problème
                 SendInformations();
                 
-                //En fonction du résultat de l'envoi on affiche une pop-up qui explique le problème
-                controlleurVue.erreurSaisieAlerte();
+                if(controlleurVue.getStatutReponse()) {
+                    //Mise en place de la scene suivante    
+                    CreateTeamView teamCreateView = new CreateTeamView() ; 
+                    teamCreateView.setControlleurVue(controlleurVue);
+                    Scene sceneCreateTeam = teamCreateView.creationScene() ; 
+                    stageP.setScene(sceneCreateTeam);  
+                }
                 
-                
-
-                //Mise en place de la scene suivante    
-                CreateTeamView teamCreateView = new CreateTeamView() ; 
-                teamCreateView.setControlleurVue(controlleurVue);
-                Scene sceneCreateTeam = teamCreateView.creationScene() ; 
-                stageP.setScene(sceneCreateTeam);
             }
         });
         
