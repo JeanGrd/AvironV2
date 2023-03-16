@@ -1,18 +1,18 @@
 package javaprojetaviron.model;
-
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Tournoi test = new Tournoi("test","Narbonne", "FM4X+", 75,5, 4, TypeTournoi.COURSE_LIGNE);
+        Tournoi test = new Tournoi("test","Narbonne", "FS4X+", 500, 25, 4, TypeTournoi.COURSE_LIGNE);   
+        LocalDate date = LocalDate.of(2000, 10, 26);
 
-        Date date = new Date();
-
-        Participant p1 = new Participant("Jean", "Marc", date);
-        Participant p2 = new Participant("Jean", "Francois", date);
-        Participant p3 = new Participant("Jean", "Ana", date);
-        Participant p4 = new Participant("Jean", "Covici", date);
+        Participant p1 = new Participant("Jean", "Marc", Sexe.FEMME, date);
+        Participant p2 = new Participant("Jean", "Francois", Sexe.FEMME, date);
+        Participant p3 = new Participant("Jean", "Ana", Sexe.FEMME, date);
+        Participant p4 = new Participant("Jean", "Covici", Sexe.FEMME, date);
+        
+        p3.getCurrentAge();
 
         Embarcation emb1 = new Embarcation("Winner", 4);
         emb1.positionnerParticipant(1, p1);
@@ -49,10 +49,7 @@ public class Main {
 
         System.out.println(test.isOk());
 
-        test.running(25);
-
-        test.showClassement(25);
-        test.showClassement(50);
+        test.running();
 
         test.addInClassement(75, 0, emb3);
         test.addInClassement(75, 0, emb2);

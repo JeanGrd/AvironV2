@@ -54,15 +54,13 @@ public class Tournoi{
         return armature;
     }
 
-    public Tournoi(String nom, String lieu, String code, float metres, float intervalleT,int nb_participants , TypeTournoi type) throws Exception {
-        this.nom = nom;
+    public Tournoi(String nom, String lieu, String code, float metres, float intervalle, int nb_participants, TypeTournoi type) throws Exception {        this.nom = nom;
         this.lieu = lieu;
         this.metres = metres;
-        this.intervalle = intervalleT ; 
+        this.intervalle = intervalle; 
         this.type = type;
         this.nb_participants = nb_participants;
         this.concourrants = new MaxSizeArrayList<>(this.nb_participants);
-        decodeCode(code);
         this.classement = new HashMap<Float, Map<Integer, Pair<Embarcation, Float>>>();
     }
 
@@ -156,13 +154,8 @@ public class Tournoi{
         }
     }
 
-    public void running(float intervalle) throws Exception {
-
-        if (this.metres%intervalle != 0) {
-            throw new Exception("Intervalle incorrecte");
-        }
-
-        if (!this.isOk()) {
+    public void running() throws Exception {
+         if (!this.isOk()) {
             throw new Exception("Tournoi non valide");
         }
 
