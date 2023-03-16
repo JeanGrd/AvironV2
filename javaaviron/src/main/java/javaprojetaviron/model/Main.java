@@ -69,6 +69,6 @@ public class Main {
         MyTournament.showClassement(50);
         MyTournament.showClassement(75);
 
-        MyTournament.generateCSV("bonjour");
+        MyTournament.generateCSV("bonjour.csv");
     }
 }

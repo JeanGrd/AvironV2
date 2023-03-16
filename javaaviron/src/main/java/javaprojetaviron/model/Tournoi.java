@@ -263,7 +263,7 @@ public class Tournoi{
     }
 
     public void generateCSV(String filePath) {
-        try (FileWriter writer = new FileWriter(filePath + ".csv")) {
+        try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Intervalle, Place, Temps, Nom de l'embarcation\n");
 
             List<Float> sortedKeys = new ArrayList<>(classement.keySet());
