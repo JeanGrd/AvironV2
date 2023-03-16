@@ -1,17 +1,19 @@
 package javaprojetaviron.model;
+
 import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Tournoi test = new Tournoi("test","Narbonne", "FS4X+", 500, 25, 4, TypeTournoi.COURSE_LIGNE);   
+        Tournoi test = new Tournoi("test","Narbonne", "FS4X+", 500, 25, 4, TypeTournoi.COURSE_LIGNE);
+
         LocalDate date = LocalDate.of(2000, 10, 26);
 
         Participant p1 = new Participant("Jean", "Marc", Sexe.FEMME, date);
         Participant p2 = new Participant("Jean", "Francois", Sexe.FEMME, date);
         Participant p3 = new Participant("Jean", "Ana", Sexe.FEMME, date);
         Participant p4 = new Participant("Jean", "Covici", Sexe.FEMME, date);
-        
+
         p3.getCurrentAge();
 
         Embarcation emb1 = new Embarcation("Winner", 4);
@@ -54,7 +56,16 @@ public class Main {
         test.addInClassement(75, 0, emb3);
         test.addInClassement(75, 0, emb2);
 
+        test.showClassement(25);
         test.showClassement(75);
+        test.showClassement(100);
+        test.showClassement(200);
+        test.showClassement(250);
+        test.showClassement(400);
+        test.showClassement(425);
+        test.showClassement(450);
+        test.showClassement(475);
+        test.showClassement(500);
 
     }
 }
