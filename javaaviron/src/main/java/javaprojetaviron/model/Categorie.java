@@ -1,3 +1,5 @@
+package javaprojetaviron.model;
+
 public enum Categorie {
 
     MINIME(1500, 10),

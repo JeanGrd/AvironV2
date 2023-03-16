@@ -1,3 +1,5 @@
+package javaprojetaviron.model;
+
 import java.util.Objects;
 
 public enum Sexe {
