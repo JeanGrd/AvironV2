@@ -18,7 +18,7 @@ public class Embarcation{
     }
 
     public int getSizeEmbarcation() {
-        return sizeEmbarcation - 1;
+        return sizeEmbarcation;
     }
 
     public ArrayList<Participant> getPlacementParticipant() {
@@ -31,7 +31,7 @@ public class Embarcation{
 
     public Embarcation (String nom, int sizeEmbarcation){
         this.nom = nom;
-        this.sizeEmbarcation = sizeEmbarcation + 1;
+        this.sizeEmbarcation = sizeEmbarcation;
         this.placementParticipant = new ArrayList<Participant>(this.sizeEmbarcation);
         for (int i = 0; i < this.sizeEmbarcation; i++) {
             placementParticipant.add(null);

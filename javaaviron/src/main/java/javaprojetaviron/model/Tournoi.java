@@ -1,10 +1,14 @@
 package javaprojetaviron.model;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import javafx.util.Pair;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Tournoi{
@@ -70,7 +74,7 @@ public class Tournoi{
 
     public void decodeCode(String code) throws Exception {
         // Vérification de la longueur du code
-        if (code.length() < 4 || code.length() > 5) {
+        if (code.length() < 3 || code.length() > 5) {
             throw new Exception("Le code n'est pas valide");
         }
 
@@ -256,5 +260,85 @@ public class Tournoi{
         }
         //Rajout à la liste des embarcations 
         
-    }    
+    }
+
+    public void generateCSV(String filePath) {
+        try (FileWriter writer = new FileWriter(filePath + ".csv")) {
+            writer.write("Intervalle, Place, Temps, Nom de l'embarcation\n");
+
+            List<Float> sortedKeys = new ArrayList<>(classement.keySet());
+            Collections.sort(sortedKeys);
+
+            for (Float temps : sortedKeys) {
+                Map<Integer, Pair<Embarcation, Float>> classementParTemps = classement.get(temps);
+                for (Integer place : classementParTemps.keySet()) {
+                    Pair<Embarcation, Float> pair = classementParTemps.get(place);
+                    Embarcation embarcation = pair.getKey();
+                    Float tempsDeCourse = pair.getValue();
+                    String nomEmbarcation;
+                    try {
+                        nomEmbarcation = embarcation.getNom();
+                    } catch (Exception e){
+                        nomEmbarcation = null;
+                    }
+                    writer.write("" + temps + ',' + place + "," + tempsDeCourse + "," + nomEmbarcation + "\n");
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la génération du fichier CSV : " + e.getMessage());
+        }
+    }
+
+    public static Tournoi readTournoi(String filePath) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        String ligne;
+        Tournoi tournoi = null;
+        Embarcation embarcationCourante = null;
+        List<Embarcation> embarcations = new ArrayList<>();
+        while ((ligne = br.readLine()) != null) {
+            String[] elements = ligne.split(";");
+            String type = elements[0];
+            switch (type) {
+                case "TOURNOI":
+                    String nomTournoi = elements[1];
+                    String lieu = elements[2];
+                    String code = elements[3];
+                    int distance = Integer.parseInt(elements[4]);
+                    int nbParticipants = Integer.parseInt(elements[5]);
+                    int nbEmbarcations = Integer.parseInt(elements[6]);
+                    String typeT = elements[7];
+                    TypeTournoi typeTournoi = TypeTournoi.valueOf(typeT);
+                    tournoi = new Tournoi(nomTournoi, lieu, code, distance, nbParticipants, nbEmbarcations, typeTournoi);
+                    break;
+                case "EMBARCATION":
+                    String nomEmbarcation = elements[1];
+                    int nbRameurs = Integer.parseInt(elements[2]);
+                    embarcationCourante = new Embarcation(nomEmbarcation, nbRameurs);
+                    embarcations.add(embarcationCourante);
+                    break;
+                case "PARTICIPANT":
+                    int indexParticipant = Integer.parseInt(elements[1]);
+                    String prenom = elements[2];
+                    String nom = elements[3];
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate dateNaissance = LocalDate.parse(elements[4], formatter);
+                    Participant participant = new Participant(prenom, nom, dateNaissance);
+                    if (indexParticipant != 0) {
+                        embarcationCourante.positionnerParticipant(indexParticipant, participant);
+                    } else {
+                        embarcationCourante.putBarreur(participant);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (Embarcation embarcation : embarcations) {
+            tournoi.addConcourrant(embarcation);
+        }
+        return tournoi;
+    }
+
+
+
 }
