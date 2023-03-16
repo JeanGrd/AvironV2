@@ -8,11 +8,19 @@ public enum Categorie {
     SENIOR(6000, 40),
     VETERANT(6000, 200);
 
-    private int nb_max_km;
+    private int nb_max_m;
     private int max_age;
 
+    public int getNb_max_m() {
+        return nb_max_m;
+    }
+
+    public int getMax_age() {
+        return max_age;
+    }
+
     private Categorie(int nb_max_km, int max_age) {
-        this.nb_max_km = nb_max_km;
+        this.nb_max_m = nb_max_km;
         this.max_age = max_age;
     }
 

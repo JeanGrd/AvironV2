@@ -13,6 +13,7 @@ public class Tournoi{
     private final String lieu;
     private String code;
     private final float metres;
+    private final float intervalle;
     private boolean estBarre;
     private final TypeTournoi type;
     private Categorie categorie;
@@ -45,14 +46,24 @@ public class Tournoi{
         return armature;
     }
 
-    public Tournoi(String nom, String lieu, String code, float metres, int nb_participants , TypeTournoi type) throws Exception {
+    public Tournoi(String nom, String lieu, String code, float metres, float intervalle, int nb_participants, TypeTournoi type) throws Exception {
+        this.decodeCode(code);
         this.nom = nom;
         this.lieu = lieu;
         this.metres = metres;
+        this.intervalle = intervalle;
         this.type = type;
         this.nb_participants = nb_participants;
+
+        if (this.metres%intervalle != 0) {
+            throw new Exception("Intervalle incorrecte");
+        }
+
+        if (metres > this.categorie.getNb_max_m()) {
+            throw new Exception ("Nombre de metres donné n'appartient pas à la catégorie spécifié dans le code");
+        }
+
         this.concourrants = new MaxSizeArrayList<>(this.nb_participants);
-        decodeCode(code);
         this.classement = new HashMap<Float, Map<Integer, Pair<Embarcation, Float>>>();
     }
 
@@ -79,6 +90,14 @@ public class Tournoi{
 
         if (!embarcation.isOk()) {
             throw new Exception("Embarcation non terminée");
+        }
+
+        if(!embarcation.checkAge(this.categorie.getMax_age())) {
+            throw new Exception("Un participant est hors catégorie");
+        }
+
+        if(!embarcation.checkSexe(this.sexe)) {
+            throw new Exception("Un participant n'a pas le sexe adéquat pour cette compétition");
         }
 
         if (embarcation.getSizeEmbarcation() != this.nb_participants_par_embarcation) {
@@ -146,11 +165,7 @@ public class Tournoi{
         }
     }
 
-    public void running(float intervalle) throws Exception {
-
-        if (this.metres%intervalle != 0) {
-            throw new Exception("Intervalle incorrecte");
-        }
+    public void running() throws Exception {
 
         if (!this.isOk()) {
             throw new Exception("Tournoi non valide");
