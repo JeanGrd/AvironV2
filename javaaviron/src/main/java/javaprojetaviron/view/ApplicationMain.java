@@ -17,7 +17,7 @@ public class ApplicationMain extends Application{
     @Override
     public void start(Stage primaryStage) {
         
-        //Initialisation de tout les modèles avant à vide et liaison avec le controlleur c !!!!!
+        //Initialisation de tout les modèles avant à vide et liaison avec le controlleur c sur le tournoi !!!!!
         ControllerAppli c = new ControllerAppli(); 
         HomeView homescene = new HomeView() ; 
         homescene.setControlleurVue(c);

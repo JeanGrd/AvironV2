@@ -35,7 +35,6 @@ public class CreateTeamView {
     
     //Bouttons
     private Button suivantB = new Button("Suivant") ;
-    private Button retourB = new Button("Retour") ; 
     
     //Scenes
     private VBox rootTitre = new VBox(10) ;
@@ -86,16 +85,6 @@ public class CreateTeamView {
                 }
                
                 
-            }
-            
-        });
-        
-        this.retourB.setOnAction(new EventHandler<ActionEvent> () {
-            public void handle(ActionEvent e) {
-                Scene s1 = ((Button)e.getSource()).getScene() ; 
-                Stage stageP =  (Stage) s1.getWindow() ; 
-                
-                //Mise en place de la scene arrière
             }
             
         });
@@ -161,7 +150,7 @@ public class CreateTeamView {
       
         //Creation de la scene des boutons
         this.rootBouton.setAlignment(Pos.CENTER);
-        this.rootBouton.getChildren().addAll(retourB, suivantB) ; 
+        this.rootBouton.getChildren().addAll(suivantB) ; 
         
         //Creation de la scene principale  
         this.root.setAlignment(Pos.CENTER);
