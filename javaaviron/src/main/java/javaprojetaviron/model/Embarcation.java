@@ -89,14 +89,4 @@ public class Embarcation{
         return true;
     }
 
-    public boolean checkSexe (Sexe sexe) {
-        for (Participant participant : this.placementParticipant) {
-            if (participant != null) {
-                if (participant.getSexe() != sexe)
-                    return false;
-            }
-        }
-        return true;
-    }
-
 }

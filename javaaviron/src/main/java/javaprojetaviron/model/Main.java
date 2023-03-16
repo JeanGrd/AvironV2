@@ -5,14 +5,14 @@ import java.time.LocalDate;
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Tournoi test = new Tournoi("test","Narbonne", "FS4X+", 500, 25, 4, TypeTournoi.COURSE_LIGNE);
+        Tournoi test = new Tournoi("test","Narbonne", "FS4X+", 50, 25, 4, TypeTournoi.COURSE_LIGNE);
 
         LocalDate date = LocalDate.of(2000, 10, 26);
 
-        Participant p1 = new Participant("Jean", "Marc", Sexe.FEMME, date);
-        Participant p2 = new Participant("Jean", "Francois", Sexe.FEMME, date);
-        Participant p3 = new Participant("Jean", "Ana", Sexe.FEMME, date);
-        Participant p4 = new Participant("Jean", "Covici", Sexe.FEMME, date);
+        Participant p1 = new Participant("Jean", "Marc", date);
+        Participant p2 = new Participant("Jean", "Francois", date);
+        Participant p3 = new Participant("Jean", "Ana", date);
+        Participant p4 = new Participant("Jean", "Covici", date);
 
         p3.getCurrentAge();
 

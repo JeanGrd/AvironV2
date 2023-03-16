@@ -97,10 +97,6 @@ public class Tournoi{
             throw new Exception("Un participant est hors catégorie");
         }
 
-        if(!embarcation.checkSexe(this.sexe)) {
-            throw new Exception("Un participant n'a pas le sexe adéquat pour cette compétition");
-        }
-
         if (embarcation.getSizeEmbarcation() != this.nb_participants_par_embarcation) {
             throw new Exception("Cette embarcation n'a pas la bonne dimension pour ce tournoi");
         }
