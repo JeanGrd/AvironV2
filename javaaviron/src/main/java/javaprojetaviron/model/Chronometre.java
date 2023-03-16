@@ -2,22 +2,26 @@ package javaprojetaviron.model;
 
 public class Chronometre {
     private float temps;
+    private Thread thread;
 
-    public void running(float temps_limite) {
-        Thread thread = new Thread(new Runnable() {
+    public void running() {
+        thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 long debut = System.currentTimeMillis();
-                while (true) {
+                while (!Thread.interrupted()) {
                     long temps_ecoule = System.currentTimeMillis() - debut;
                     temps = temps_ecoule / 1000f; // Convertir en secondes
-                    if (temps >= temps_limite) {
-                        break;
-                    }
                 }
             }
         });
         thread.start();
+    }
+
+    public void stop() {
+        if (thread != null) {
+            thread.interrupt();
+        }
     }
 
     public float getTemps() {

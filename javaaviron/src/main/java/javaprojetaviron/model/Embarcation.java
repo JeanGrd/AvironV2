@@ -3,17 +3,44 @@ package javaprojetaviron.model;
 import java.util.ArrayList;
 
 public class Embarcation{
-    public String nom;
-    public float vitesse;
-    public float cadence;
-    public ArrayList<Participant> placementParticipant;
+    private String nom;
+    private float vitesse;
+    private float cadence;
+    private int sizeEmbarcation;
+    private ArrayList<Participant> placementParticipant;
+
+    public float getVitesse() {
+        return vitesse;
+    }
+
+    public float getCadence() {
+        return cadence;
+    }
+
+    public int getSizeEmbarcation() {
+        return sizeEmbarcation - 1;
+    }
+
+    public ArrayList<Participant> getPlacementParticipant() {
+        return placementParticipant;
+    }
+
+    public String getNom() {
+        return nom;
+    }
 
     public Embarcation (String nom, int sizeEmbarcation){
         this.nom = nom;
-        this.placementParticipant = new ArrayList<Participant>(sizeEmbarcation);
-        for (int i = 0; i < sizeEmbarcation; i++) {
+        this.sizeEmbarcation = sizeEmbarcation + 1;
+        this.placementParticipant = new ArrayList<Participant>(this.sizeEmbarcation);
+        for (int i = 0; i < this.sizeEmbarcation; i++) {
             placementParticipant.add(null);
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.getNom();
     }
 
     public void positionnerParticipant (int indice, Participant participant) throws Exception{
@@ -39,14 +66,17 @@ public class Embarcation{
         placementParticipant.set(0, null);
     }
 
-    public boolean embarcationIsOk(){
-        for(Participant p : placementParticipant)
-        {
-            if(p == null)
-            {
+    public boolean containsBarreur() {
+        return this.placementParticipant.get(0) != null;
+    }
+
+    public boolean isOk () {
+        for (int i = 1; i < this.placementParticipant.size(); i++) {
+            if (this.placementParticipant.get(i) == null) {
                 return false;
             }
         }
         return true;
     }
+
 }

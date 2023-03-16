@@ -1,3 +1,5 @@
+package javaprojetaviron.model;
+
 import java.util.ArrayList;
 
 public class MaxSizeArrayList<E> extends ArrayList<E> {
@@ -12,6 +14,6 @@ public class MaxSizeArrayList<E> extends ArrayList<E> {
         if (size() < maxSize) {
             return super.add(e);
         }
-        return false;
+        throw new RuntimeException("Nombre total d'embarcations est dépassé !");
     }
 }

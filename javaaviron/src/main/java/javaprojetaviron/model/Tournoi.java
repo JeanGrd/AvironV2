@@ -1,18 +1,25 @@
-import java.util.ArrayList;
+package javaprojetaviron.model;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import javafx.util.Pair;
+
 
 public class Tournoi{
-    private int nb_participants;
-    private String nom;
-    private String lieu;
-    private String code;
-    private float metres;
+    private final int nb_participants;
     private int nb_participants_par_embarcation;
+    private final String nom;
+    private final String lieu;
+    private String code;
+    private final float metres;
     private boolean estBarre;
-    private TypeTournoi type;
+    private final TypeTournoi type;
     private Categorie categorie;
     private Sexe sexe;
     private Armature armature;
-    private MaxSizeArrayList<Integer> concourrants;
+    private final MaxSizeArrayList<Embarcation> concourrants;
+    private final Map<Float, Map<Integer, Pair<Embarcation, Float>>> classement;
 
     public int getNb_participants_par_embarcation() {
         return nb_participants_par_embarcation;
@@ -38,7 +45,7 @@ public class Tournoi{
         return armature;
     }
 
-    public Tournoi(String nom, String lieu, String code, float metres, int nb_participants ,TypeTournoi type) {
+    public Tournoi(String nom, String lieu, String code, float metres, int nb_participants , TypeTournoi type) throws Exception {
         this.nom = nom;
         this.lieu = lieu;
         this.metres = metres;
@@ -46,20 +53,13 @@ public class Tournoi{
         this.nb_participants = nb_participants;
         this.concourrants = new MaxSizeArrayList<>(this.nb_participants);
         decodeCode(code);
+        this.classement = new HashMap<Float, Map<Integer, Pair<Embarcation, Float>>>();
     }
 
-    public void showConcourrants() {
-        for (Integer c : this.concourrants) {
-            System.out.println(c);
-        }
-
-    }
-
-    public void decodeCode(String code) {
+    public void decodeCode(String code) throws Exception {
         // Vérification de la longueur du code
         if (code.length() < 4 || code.length() > 5) {
-            System.out.println("Le code n'est pas valide");
-            return;
+            throw new Exception("Le code n'est pas valide");
         }
 
         // Récupération des différentes informations
@@ -73,6 +73,119 @@ public class Tournoi{
         }
         this.estBarre = code.contains("+");
 
+    }
+
+    public void addConcourrant(Embarcation embarcation) throws Exception {
+
+        if (!embarcation.isOk()) {
+            throw new Exception("Embarcation non terminée");
+        }
+
+        if (embarcation.getSizeEmbarcation() != this.nb_participants_par_embarcation) {
+            throw new Exception("Cette embarcation n'a pas la bonne dimension pour ce tournoi");
+        }
+
+        if (embarcation.containsBarreur() != this.estBarre) {
+            throw new Exception("Cette embarcation ne contient pas de barreur");
+        }
+
+        if (this.concourrants.contains(embarcation)) {
+            throw new Exception("embarcation existe déjà");
+        }
+
+        this.concourrants.add(embarcation);
+    }
+
+    public void rmConcourrant(Embarcation embarcation){
+        this.concourrants.remove(embarcation);
+    }
+
+    public void showConcourrants() {
+        for (Embarcation c : this.concourrants) {
+            System.out.println(c);
+        }
+
+    }
+
+    private void initializeClassement(float intervalle, int position, float temps) {
+        if (!classement.containsKey(intervalle)) {
+            classement.put(intervalle, new HashMap<Integer, Pair<Embarcation, Float>>());
+        }
+        classement.get(intervalle).put(position, new Pair<Embarcation, Float>(null, temps));
+    }
+
+    public void addInClassement(float intervalle, int position, Embarcation embarcation) {
+        if (!classement.containsKey(intervalle)) {
+            classement.put(intervalle, new HashMap<Integer, Pair<Embarcation, Float>>());
+        }
+
+        Pair<Embarcation, Float> pair = new Pair<Embarcation, Float>(embarcation, null);
+
+        // Remplacer la valeur null par le nom de l'embarcation si elle est null
+        if (classement.get(intervalle).get(position) != null) {
+            pair = classement.get(intervalle).get(position);
+            if (pair.getKey() == null) {
+                pair = new Pair<Embarcation, Float>(embarcation, pair.getValue());
+            }
+        }
+
+        classement.get(intervalle).put(position, pair);
+    }
+
+    public void showClassement(float intervalle) throws Exception {
+        if (classement.containsKey(intervalle)) {
+            System.out.println("classement de la course " + intervalle + ":");
+            for (Map.Entry<Integer, Pair<Embarcation, Float>> entry : classement.get(intervalle).entrySet()) {
+                int position = entry.getKey();
+                Embarcation embarcation = entry.getValue().getKey();
+                float valeur = entry.getValue().getValue();
+                System.out.println("Position: " + (position + 1) + ", Embarcation: " + embarcation + ", Valeur: " + valeur);
+            }
+        } else {
+            throw new Exception("Intervalle " + intervalle + " non trouvée dans le classement.");
+        }
+    }
+
+    public void running(float intervalle) throws Exception {
+
+        if (this.metres%intervalle != 0) {
+            throw new Exception("Intervalle incorrecte");
+        }
+
+        if (!this.isOk()) {
+            throw new Exception("Tournoi non valide");
+        }
+
+        Chronometre chrono = new Chronometre();
+        Senseur firstArrivalSensor = new Senseur(intervalle);
+        Random rand = new Random();
+
+        chrono.running();
+
+        float distance_parcouru = 0f;
+        float first_arrival = firstArrivalSensor.genererTemps();
+
+        while(distance_parcouru < this.metres) {
+            while(chrono.getTemps() < first_arrival){
+                //System.out.println(first_arrival);
+                Thread.yield(); // permet à d'autres threads de s'exécuter
+            }
+
+            distance_parcouru += intervalle;
+
+            initializeClassement(distance_parcouru, 0, first_arrival);
+            first_arrival = firstArrivalSensor.genererTemps() + chrono.getTemps();
+
+            for (int i = 1; i < this.nb_participants; i++) {
+                double randomNum = (float) (0.5 + (3 - 0.5) * rand.nextDouble()) + chrono.getTemps();
+                while(chrono.getTemps() < randomNum) {
+                    initializeClassement(distance_parcouru, i, (float) randomNum);
+                }
+
+            }
+
+        }
+        chrono.stop();
     }
 
     public String getNom() {
@@ -95,16 +208,8 @@ public class Tournoi{
         return type;
     }
 
-    public ArrayList<Integer> getConcourrants() {
-        return concourrants;
-    }
-
-    public void addConcourrant(Integer embarcation){
-        this.concourrants.add(embarcation);
-    }
-
-    public void rmConcourrant(Integer embarcation){
-        this.concourrants.remove(embarcation);
+    public String getConcourrants(int position) {
+        return this.concourrants.get(position).getNom();
     }
 
     public boolean isOk(){
