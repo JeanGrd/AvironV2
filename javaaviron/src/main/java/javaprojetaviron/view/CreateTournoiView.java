@@ -22,10 +22,10 @@ import javaprojetaviron.controller.ControllerAppli;
  *  La classe CreationTournoiView représente l'interface qui permet d'initialiser le tournoi 
  * @author PaulineVarin
  */
-public class CreateTournoiView { 
+public class CreateTournoiView extends MotherView { 
     //Recuperation données
     private ControllerAppli controlleurVue ; 
-    private ArrayList<String> listeInfos = new ArrayList<>() ; 
+    private ArrayList<String> listeInfos ; 
     
     //Bouttons
     private Button suivantB = new Button("Suivant") ;
@@ -57,6 +57,8 @@ public class CreateTournoiView {
     }
     
     public void SendInformations () {
+        this.listeInfos = new ArrayList<>() ; 
+        
         for (int i=0;i<this.listTextBox.length;i++) {
            listeInfos.add((String)listTextBox[i].getText());
         }
@@ -102,7 +104,6 @@ public class CreateTournoiView {
                     Scene sceneCreateTeam = teamCreateView.creationScene() ; 
                     stageP.setScene(sceneCreateTeam);  
                 }
-                
             }
         });
         
@@ -166,12 +167,12 @@ public class CreateTournoiView {
         listComboBox[1].getSelectionModel().select(0);
         
         ObservableList<String> nbMetres
-                = FXCollections.observableArrayList ("2000", "3000","4000","5000","6000");
+                = FXCollections.observableArrayList ("20", "40","60","80","100");
         listComboBox[2] = new ComboBox(nbMetres);
         listComboBox[2].getSelectionModel().select(0);
         
        ObservableList<String> intervalleTemps
-                = FXCollections.observableArrayList ("500", "1000","1500","2000","2500");
+                = FXCollections.observableArrayList ("5", "10","15","20","25");
         listComboBox[3] = new ComboBox(intervalleTemps);
         listComboBox[3].getSelectionModel().select(0);
               
@@ -207,9 +208,13 @@ public class CreateTournoiView {
         Scene scene = new Scene(root, 1000,600); 
 
         //Liaison de la scene et du controleur
-        this.controlleurVue.setVueTournoi(scene);
+        this.controlleurVue.setVueTournoi(this);
  
         return scene ;
     }
-    
+
+    @Override
+    public void sendNomEquipe(String n) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

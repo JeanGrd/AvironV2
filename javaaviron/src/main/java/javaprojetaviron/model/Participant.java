@@ -6,13 +6,11 @@ import java.time.Period;
 public class Participant{
     private String prenom;
     private String nom;
-    private  Sexe sexe;
     public LocalDate dateNaissance;
 
-    public Participant (String prenom, String nom, Sexe sexe, LocalDate dateNaissance){
+    public Participant (String prenom, String nom, LocalDate dateNaissance){
         this.prenom = prenom;
         this.nom = nom;
-        this.sexe = sexe;
         this.dateNaissance = dateNaissance;
     }
 
@@ -22,10 +20,6 @@ public class Participant{
 
     public String getNom() {
         return nom;
-    }
-
-    public Sexe getSexe() {
-        return sexe;
     }
 
     public LocalDate getDateNaissance() {

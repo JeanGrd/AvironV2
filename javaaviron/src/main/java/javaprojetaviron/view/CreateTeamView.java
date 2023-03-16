@@ -17,14 +17,14 @@ import javaprojetaviron.controller.ControllerAppli;
  * @author PaulineVarin
  */
 
-public class CreateTeamView {
+public class CreateTeamView extends MotherView {
     public static int nombreEquipes = 4;
     private static int nombreParticipantsEquipe = 1 ;
-    public static int equipeCourante = 1 ; 
+    public static int equipeCourante = 1; 
     
     //Récupération données
     private ControllerAppli controlleurVue ; 
-    private ArrayList<String> listeInfos = new ArrayList<>() ; 
+    private ArrayList<String> listeInfos ; 
     
     //Labels
     private Label l = new Label() ;  
@@ -48,9 +48,7 @@ public class CreateTeamView {
     public void setControlleurVue(ControllerAppli c) {
         this.controlleurVue = c;
     }
-    
-    
-    
+
     /**
      * Permet de mettre à jour la valeur de l'attribut nbEquipe en fonction de celle reçu via le controlleur 
      * @param nbEquipe int
@@ -64,6 +62,8 @@ public class CreateTeamView {
     }
     
     public void SendInformations () {
+        listeInfos= new ArrayList<>() ; 
+        
         this.listeInfos.add(boxNomEquipe.getText()) ; 
 
         for (int i=0;i<listTextBox.length;i++) {
@@ -87,25 +87,32 @@ public class CreateTeamView {
         //Definiton du comportement des boutons
         this.suivantB.setOnAction(new EventHandler<ActionEvent> () {
             public void handle(ActionEvent e) {
-                if(CreateTeamView.equipeCourante < CreateTeamView.nombreEquipes) {
-                    //Envoie des informations au controlleur
-                    SendInformations() ; 
+                //Envoie des informations au controlleur
+                SendInformations() ; 
+                if (controlleurVue.getStatutReponse()) {
+                    if(CreateTeamView.equipeCourante < CreateTeamView.nombreEquipes) {
+                        CreateTeamView.equipeCourante++ ;
+                        //Mise en place de la même scène pour une autre équipe autant de fois que d'équipes existantes
+                        //et liaison avec le controlleur 
+                        Scene s1 = ((Button)e.getSource()).getScene() ; 
+                        Stage stageP =  (Stage) s1.getWindow() ; 
 
-                    CreateTeamView.equipeCourante++ ; 
-                
-                    //Mise en place de la même scène pour une autre équipe autant de fois que d'équipes existantes
-                    //et liaison avec le controlleur 
-                    Scene s1 = ((Button)e.getSource()).getScene() ; 
-                    Stage stageP =  (Stage) s1.getWindow() ; 
+                        CreateTeamView teamCreateView = new CreateTeamView() ; 
+                        teamCreateView.setControlleurVue(controlleurVue);
+                        Scene sceneCreateTeam = teamCreateView.creationScene() ; 
+                        stageP.setScene(sceneCreateTeam);  
+                    }
+                    else {
+                        Scene s1 = ((Button)e.getSource()).getScene() ; 
+                        Stage stageP =  (Stage) s1.getWindow() ; 
+
+                        TournoiView tournoiV = new TournoiView() ;
+                        tournoiV.setControlleurVue(controlleurVue) ; 
+                        Scene sceneCreateTeam = tournoiV.creationScene() ; 
+                        stageP.setScene(sceneCreateTeam);
                     
-                    CreateTeamView teamCreateView = new CreateTeamView() ; 
-                    teamCreateView.setControlleurVue(controlleurVue);
-                    Scene sceneCreateTeam = teamCreateView.creationScene() ; 
-                    stageP.setScene(sceneCreateTeam);
-                    
-                } else {
-                    System.out.println("Passage scene suivante") ; 
-                }
+                    }
+                } 
             }
             
         });
@@ -179,11 +186,16 @@ public class CreateTeamView {
         Scene scene = new Scene(root, 1000,600); 
         
         //Liaison de la scene et du controleur
-        this.controlleurVue.setVueTournoi(scene);
+        this.controlleurVue.setVueTournoi(this);
         
         
         //Test du bon fonctionnement
         return scene ; 
     }
-    
+
+    @Override
+    public void sendNomEquipe(String n) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+  
 }
