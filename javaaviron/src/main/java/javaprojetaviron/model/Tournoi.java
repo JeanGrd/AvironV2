@@ -153,12 +153,17 @@ public class Tournoi {
     }
 
     public void showClassement(float intervalle) throws Exception {
+        ArrayList<String> infosC = new ArrayList<>() ; 
         if (classement.containsKey(intervalle)) {
             System.out.println("classement de la course " + intervalle + ":");
             for (Map.Entry<Integer, Pair<Embarcation, Float>> entry : classement.get(intervalle).entrySet()) {
                 int position = entry.getKey();
                 Embarcation embarcation = entry.getValue().getKey();
                 float valeur = entry.getValue().getValue();
+                
+                infosC.add(Integer.toString(position + 1)+"-"+embarcation.getNom()) ; 
+    
+                this.controlleur.sendInformationsToView(infosC) ; 
                 System.out.println("Position: " + (position + 1) + ", Embarcation: " + embarcation + ", Valeur: " + valeur);
             }
         } else {
@@ -220,6 +225,7 @@ public class Tournoi {
             this.showClassement(distance_parcouru);
         }
         chrono.stop();
+        this.controlleur.finTournoi() ; 
     }
 
     public String getNom() {
@@ -314,5 +320,13 @@ public class Tournoi {
         }
 
         return e;
+    }
+    
+    public ArrayList getNomsEmbarcations () {
+        ArrayList<String> noms = new ArrayList<>() ; 
+        for(int i=0;i<concourrants.size();i++) {
+            noms.add(concourrants.get(i).getNom()) ; 
+        }
+        return noms ; 
     }
 }

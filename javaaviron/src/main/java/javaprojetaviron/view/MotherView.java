@@ -4,6 +4,7 @@
  */
 package javaprojetaviron.view;
 
+import java.util.ArrayList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -22,6 +23,10 @@ import javafx.stage.Stage;
 public abstract class MotherView {
     public abstract void sendNomEquipe(String n) ; 
     
+    public abstract void majView(ArrayList<String> infos) ; 
+    
+    public abstract void finTournoi() ; 
+    
     public void demandeSaisie() {
         Stage popupwindow= new Stage();
         
@@ -32,7 +37,6 @@ public abstract class MotherView {
         valider.setOnAction(new EventHandler<ActionEvent> () {
             @Override
             public void handle(ActionEvent t) {
-                System.out.println("HELLO VOUTON");
                 sendNomEquipe(nomEquipe.getText()); 
                 popupwindow.close() ;
             }

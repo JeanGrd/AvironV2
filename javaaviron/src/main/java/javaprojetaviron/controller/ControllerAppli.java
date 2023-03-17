@@ -32,6 +32,14 @@ public class ControllerAppli {
 	alert.setContentText("Erreur dans la saisie : "+ raisonAlerte);
 	alert.showAndWait();
     }
+    
+    public void finTournoiInformation() {
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+	alert.setContentText("Fin du tournoi. Merci de fermer la fenêtre. Vous pouvez avant sauvegarder le résultat");
+	alert.showAndWait();
+    }
  
     public void setNomEquipe(String n) {
         this.nomEquipe = n ;
@@ -79,6 +87,19 @@ public class ControllerAppli {
     public String getNomEmbarcationRunning() {
        this.fenetreCourante.demandeSaisie();
        return this.nomEquipe ; 
+    }
+    
+    public ArrayList getNomsEquipes() {
+        return this.tounoiC.getNomsEmbarcations() ;
+    }
+    
+    public void sendInformationsToView(ArrayList<String> infosClassement) {
+        this.fenetreCourante.majView(infosClassement);
+    }
+    
+    public void finTournoi() {
+        this.finTournoiInformation() ; 
+        this.fenetreCourante.finTournoi();
     }
     
     
