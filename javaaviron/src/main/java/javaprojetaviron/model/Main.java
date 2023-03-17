@@ -61,7 +61,7 @@ public class Main {
 
         //test.generateCSV("test");
 
-        Tournoi MyTournament = Tournoi.readTournoi("test copy 2.csv");
+        Tournoi MyTournament = Tournoi.readTournoi("test copy 2.csv",null);
 
         MyTournament.running();
 

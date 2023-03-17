@@ -1,16 +1,6 @@
 package javaprojetaviron.controller;
 import java.util.ArrayList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javaprojetaviron.model.TypeTournoi;
 import javaprojetaviron.model.Tournoi ;   
 import javaprojetaviron.view.MotherView;
@@ -40,6 +30,20 @@ public class ControllerAppli {
 	alert.setContentText("Fin du tournoi. Merci de fermer la fenêtre. Vous pouvez avant sauvegarder le résultat");
 	alert.showAndWait();
     }
+    
+    public void enregistrerTournoi(String cheminFichier) {
+        System.out.println(cheminFichier);
+        this.tounoiC.generateCSV(cheminFichier);
+    }
+    
+    public void creationTournoiCSV(String cheminFichier) {
+        try {
+            this.tounoiC = Tournoi.readTournoi(cheminFichier, this) ;
+        } catch (Exception e) {
+            this.erreurSaisieAlerte(e.getMessage()) ; 
+        }
+         
+    } 
  
     public void setNomEquipe(String n) {
         this.nomEquipe = n ;
