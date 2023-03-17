@@ -111,7 +111,6 @@ public class Tournoi {
         /*if (embarcation.containsBarreur() != this.estBarre) {
             throw new Exception("Cette embarcation ne contient pas de barreur");
         }*/
-
         if (this.concourrants.contains(embarcation)) {
             throw new Exception("embarcation existe déjà");
         }
@@ -154,6 +153,7 @@ public class Tournoi {
 
         classement.get(intervalle).put(position, pair);
     }
+
     public void showClassement(float intervalle) throws Exception {
         ArrayList<String> infosC = new ArrayList<>();
         if (classement.containsKey(intervalle)) {
@@ -162,17 +162,17 @@ public class Tournoi {
                 int position = entry.getKey();
                 Embarcation embarcation = entry.getValue().getKey();
                 float valeur = entry.getValue().getValue();
-                
+
                 infosC.add(Integer.toString(position + 1) + "-" + embarcation.getNom());
                 this.controlleur.sendInformationsToView(infosC);
-                
+
                 System.out.println("Position: " + (position + 1) + ", Embarcation: " + embarcation + ", Valeur: " + valeur);
             }
         } else {
             throw new Exception("Intervalle " + intervalle + " non trouvée dans le classement.");
         }
     }
-    
+
     public void running() throws Exception {
 
         if (!this.isOk()) {
@@ -188,15 +188,15 @@ public class Tournoi {
         float distance_parcouru = 0f;
         float first_arrival = firstArrivalSensor.genererTemps();
 
-        while(distance_parcouru < this.metres) {
-            while(chrono.getTemps() < first_arrival){
+        while (distance_parcouru < this.metres) {
+            while (chrono.getTemps() < first_arrival) {
                 //System.out.println(first_arrival);
                 Thread.yield(); // permet à d'autres threads de s'exécuter
             }
 
             distance_parcouru += intervalle;
             initializeClassement(distance_parcouru, 0, first_arrival);
-            
+
             //Le premier vient d'arriver => on doit demander la saisie du nom de la 1ère équipe
             String nomE = controlleur.getNomEmbarcationRunning();
             Embarcation embarcationCourante = null;
@@ -206,15 +206,15 @@ public class Tournoi {
                 System.out.print(e.getMessage());
             }
             this.addInClassement(distance_parcouru, 0, embarcationCourante);
-    
+
             first_arrival = firstArrivalSensor.genererTemps() + chrono.getTemps();
 
             for (int i = 1; i < this.nb_participants; i++) {
                 double randomNum = (float) (0.5 + (3 - 0.5) * rand.nextDouble()) + chrono.getTemps();
-                while(chrono.getTemps() < randomNum) {
+                while (chrono.getTemps() < randomNum) {
                     initializeClassement(distance_parcouru, i, (float) randomNum);
                 }
-                
+
                 //le suivant vient de finir => il faut demander la saisie de son nom à l'interface
                 String nomEquipeSuivante = controlleur.getNomEmbarcationRunning();
                 Embarcation embarcationCouranteSuivante = null;
@@ -232,7 +232,6 @@ public class Tournoi {
         chrono.stop();
         this.controlleur.finTournoi();
     }
-    
 
     public String getNom() {
         return nom;
@@ -273,18 +272,18 @@ public class Tournoi {
 
     @Override
     public String toString() {
-        return "Tournoi{" +
-                "nom='" + nom + '\'' +
-                ", lieu='" + lieu + '\'' +
-                ", code='" + code + '\'' +
-                ", metres=" + metres +
-                ", estBarre=" + estBarre +
-                ", type=" + type +
-                ", categorie=" + categorie +
-                ", sexe=" + sexe +
-                ", armature=" + armature +
-                ", concourrants=" + concourrants +
-                '}';
+        return "Tournoi{"
+                + "nom='" + nom + '\''
+                + ", lieu='" + lieu + '\''
+                + ", code='" + code + '\''
+                + ", metres=" + metres
+                + ", estBarre=" + estBarre
+                + ", type=" + type
+                + ", categorie=" + categorie
+                + ", sexe=" + sexe
+                + ", armature=" + armature
+                + ", concourrants=" + concourrants
+                + '}';
     }
 
     //Rajout méthodes pour le controlleur afin de créer ce qui est necéssaire
@@ -331,4 +330,83 @@ public class Tournoi {
         }
         return noms;
     }
+
+    //Partie CSV
+    public void generateCSV(String filePath) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            writer.write("Intervalle, Place, Temps, Nom de l'embarcation\n");
+
+            List<Float> sortedKeys = new ArrayList<>(classement.keySet());
+            Collections.sort(sortedKeys);
+
+            for (Float temps : sortedKeys) {
+                Map<Integer, Pair<Embarcation, Float>> classementParTemps = classement.get(temps);
+                for (Integer place : classementParTemps.keySet()) {
+                    Pair<Embarcation, Float> pair = classementParTemps.get(place);
+                    Embarcation embarcation = pair.getKey();
+                    Float tempsDeCourse = pair.getValue();
+                    String nomEmbarcation;
+                    try {
+                        nomEmbarcation = embarcation.getNom();
+                    } catch (Exception e) {
+                        nomEmbarcation = null;
+                    }
+                    writer.write("" + temps + ',' + place + "," + tempsDeCourse + "," + nomEmbarcation + "\n");
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la génération du fichier CSV : " + e.getMessage());
+        }
+    }
+
+    public static Tournoi readTournoi(String filePath) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        String ligne;
+        Tournoi tournoi = null;
+        Embarcation embarcationCourante = null;
+        List<Embarcation> embarcations = new ArrayList<>();
+        while ((ligne = br.readLine()) != null) {
+            String[] elements = ligne.split(";");
+            String type = elements[0];
+            switch (type) {
+                case "TOURNOI":
+                    String nomTournoi = elements[1];
+                    String lieu = elements[2];
+                    String code = elements[3];
+                    int distance = Integer.parseInt(elements[4]);
+                    int nbParticipants = Integer.parseInt(elements[5]);
+                    int nbEmbarcations = Integer.parseInt(elements[6]);
+                    String typeT = elements[7];
+                    TypeTournoi typeTournoi = TypeTournoi.valueOf(typeT);
+                    tournoi = new Tournoi(nomTournoi, lieu, code, distance, nbParticipants, nbEmbarcations, typeTournoi, null);
+                    break;
+                case "EMBARCATION":
+                    String nomEmbarcation = elements[1];
+                    int nbRameurs = Integer.parseInt(elements[2]);
+                    embarcationCourante = new Embarcation(nomEmbarcation, nbRameurs);
+                    embarcations.add(embarcationCourante);
+                    break;
+                case "PARTICIPANT":
+                    int indexParticipant = Integer.parseInt(elements[1]);
+                    String prenom = elements[2];
+                    String nom = elements[3];
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate dateNaissance = LocalDate.parse(elements[4], formatter);
+                    Participant participant = new Participant(prenom, nom, dateNaissance);
+                    if (indexParticipant != 0) {
+                        embarcationCourante.positionnerParticipant(indexParticipant, participant);
+                    } else {
+                        embarcationCourante.putBarreur(participant);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (Embarcation embarcation : embarcations) {
+            tournoi.addConcourrant(embarcation);
+        }
+        return tournoi;
+    }
+
 }
