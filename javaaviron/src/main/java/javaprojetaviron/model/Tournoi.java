@@ -351,7 +351,8 @@ public class Tournoi {
                     } catch (Exception e) {
                         nomEmbarcation = null;
                     }
-                    writer.write("" + temps + ',' + place + "," + tempsDeCourse + "," + nomEmbarcation + "\n");
+                    String placement = Integer.toString(place+1) ; 
+                    writer.write("" + temps + ',' + placement + "," + tempsDeCourse + "," + nomEmbarcation + "\n");
                 }
             }
         } catch (IOException e) {
@@ -359,7 +360,7 @@ public class Tournoi {
         }
     }
 
-    public static Tournoi readTournoi(String filePath) throws Exception {
+    public static Tournoi readTournoi(String filePath, ControllerAppli c) throws Exception {
         BufferedReader br = new BufferedReader(new FileReader(filePath));
         String ligne;
         Tournoi tournoi = null;
@@ -378,7 +379,7 @@ public class Tournoi {
                     int nbEmbarcations = Integer.parseInt(elements[6]);
                     String typeT = elements[7];
                     TypeTournoi typeTournoi = TypeTournoi.valueOf(typeT);
-                    tournoi = new Tournoi(nomTournoi, lieu, code, distance, nbParticipants, nbEmbarcations, typeTournoi, null);
+                    tournoi = new Tournoi(nomTournoi, lieu, code, distance, nbParticipants, nbEmbarcations, typeTournoi, c);
                     break;
                 case "EMBARCATION":
                     String nomEmbarcation = elements[1];

@@ -139,6 +139,7 @@ public class TournoiView extends MotherView{
         this.enregistrer.setOnAction(new EventHandler<ActionEvent> () {
             @Override
             public void handle(ActionEvent t) {
+                cheminFichier(controlleurVue,"sauvegarde") ;   
             }
             
         });

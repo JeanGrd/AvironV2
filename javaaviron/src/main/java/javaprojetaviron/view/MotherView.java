@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javaprojetaviron.controller.ControllerAppli;
 
 /**
  *
@@ -51,6 +52,53 @@ public abstract class MotherView {
         root.getChildren().addAll(label,contenuBox) ; 
         
         Scene s = new Scene(root, 300,300) ; 
+        popupwindow.setScene(s);
+        popupwindow.showAndWait();
+ 
+    }
+    
+    public void cheminFichier(ControllerAppli c, String contexte) {
+        Stage popupwindow= new Stage();
+        
+        TextField chemin = new TextField() ; 
+        TextField nomFichier = new TextField() ; 
+        
+        Label cheminL= new Label("Merci de saisir le chemin ");
+        Label nomFichierL = new Label("Merci de saisir le nom du ficier") ; 
+        
+        Button valider = new Button("Valider") ; 
+        
+        valider.setOnAction(new EventHandler<ActionEvent> () {
+            @Override
+            public void handle(ActionEvent t) {
+                String cheminFichierString = chemin.getText()+nomFichier.getText()+".csv" ; 
+                
+                if(contexte.equals("sauvegarde")) {
+                    c.enregistrerTournoi(cheminFichierString);
+                    System.out.println("SAUVEGARDE");
+                } else {
+                    c.creationTournoiCSV(cheminFichierString) ; 
+                    System.out.println("ENREGISTREMENT");
+                }
+                
+                
+                popupwindow.close() ;
+            }
+        });
+        
+        HBox cheminBox = new HBox() ; 
+        cheminBox.setAlignment(Pos.CENTER);
+        cheminBox.getChildren().addAll(cheminL, chemin) ; 
+        
+        HBox nomBox = new HBox() ; 
+        nomBox.setAlignment(Pos.CENTER);
+        nomBox.getChildren().addAll(nomFichierL, nomFichier) ; 
+        
+        VBox root = new VBox() ; 
+        root.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(cheminBox, nomBox, valider);
+   
+        Scene s = new Scene(root, 500,500) ; 
         popupwindow.setScene(s);
         popupwindow.showAndWait();
  
