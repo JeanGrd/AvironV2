@@ -1,4 +1,5 @@
 package javaprojetaviron.model;
+
 import java.util.*;
 import javafx.util.Pair;
 import java.io.FileWriter;
@@ -9,9 +10,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import javaprojetaviron.controller.ControllerAppli;
 
+public class Tournoi {
 
-public class Tournoi{
+    private ControllerAppli controlleur;
     private final int nb_participants;
     private int nb_participants_par_embarcation;
     private final String nom;
@@ -51,7 +54,8 @@ public class Tournoi{
         return armature;
     }
 
-    public Tournoi(String nom, String lieu, String code, float metres, float intervalle, int nb_participants, TypeTournoi type) throws Exception {
+    public Tournoi(String nom, String lieu, String code, float metres, float intervalle, int nb_participants, TypeTournoi type, ControllerAppli c) throws Exception {
+        this.controlleur = c;
         this.decodeCode(code);
         this.nom = nom;
         this.lieu = lieu;
@@ -60,12 +64,12 @@ public class Tournoi{
         this.type = type;
         this.nb_participants = nb_participants;
 
-        if (this.metres%intervalle != 0) {
+        if (this.metres % intervalle != 0) {
             throw new Exception("Intervalle incorrecte");
         }
 
         if (metres > this.categorie.getNb_max_m()) {
-            throw new Exception ("Nombre de metres donné n'appartient pas à la catégorie spécifié dans le code");
+            throw new Exception("Nombre de metres donné n'appartient pas à la catégorie spécifié dans le code");
         }
 
         this.concourrants = new MaxSizeArrayList<>(this.nb_participants);
@@ -88,7 +92,6 @@ public class Tournoi{
             this.armature = Armature.POINTE;
         }
         this.estBarre = code.contains("+");
-
     }
 
     public void addConcourrant(Embarcation embarcation) throws Exception {
@@ -97,7 +100,7 @@ public class Tournoi{
             throw new Exception("Embarcation non terminée");
         }
 
-        if(!embarcation.checkAge(this.categorie.getMax_age())) {
+        if (!embarcation.checkAge(this.categorie.getMax_age())) {
             throw new Exception("Un participant est hors catégorie");
         }
 
@@ -105,10 +108,9 @@ public class Tournoi{
             throw new Exception("Cette embarcation n'a pas la bonne dimension pour ce tournoi");
         }
 
-        if (embarcation.containsBarreur() != this.estBarre) {
+        /*if (embarcation.containsBarreur() != this.estBarre) {
             throw new Exception("Cette embarcation ne contient pas de barreur");
-        }
-
+        }*/
         if (this.concourrants.contains(embarcation)) {
             throw new Exception("embarcation existe déjà");
         }
@@ -116,7 +118,7 @@ public class Tournoi{
         this.concourrants.add(embarcation);
     }
 
-    public void rmConcourrant(Embarcation embarcation){
+    public void rmConcourrant(Embarcation embarcation) {
         this.concourrants.remove(embarcation);
     }
 
@@ -153,12 +155,17 @@ public class Tournoi{
     }
 
     public void showClassement(float intervalle) throws Exception {
+        ArrayList<String> infosC = new ArrayList<>();
         if (classement.containsKey(intervalle)) {
             System.out.println("classement de la course " + intervalle + ":");
             for (Map.Entry<Integer, Pair<Embarcation, Float>> entry : classement.get(intervalle).entrySet()) {
                 int position = entry.getKey();
                 Embarcation embarcation = entry.getValue().getKey();
                 float valeur = entry.getValue().getValue();
+
+                infosC.add(Integer.toString(position + 1) + "-" + embarcation.getNom());
+                this.controlleur.sendInformationsToView(infosC);
+
                 System.out.println("Position: " + (position + 1) + ", Embarcation: " + embarcation + ", Valeur: " + valeur);
             }
         } else {
@@ -181,27 +188,49 @@ public class Tournoi{
         float distance_parcouru = 0f;
         float first_arrival = firstArrivalSensor.genererTemps();
 
-        while(distance_parcouru < this.metres) {
-            while(chrono.getTemps() < first_arrival){
+        while (distance_parcouru < this.metres) {
+            while (chrono.getTemps() < first_arrival) {
                 //System.out.println(first_arrival);
                 Thread.yield(); // permet à d'autres threads de s'exécuter
             }
 
             distance_parcouru += intervalle;
-
             initializeClassement(distance_parcouru, 0, first_arrival);
+
+            //Le premier vient d'arriver => on doit demander la saisie du nom de la 1ère équipe
+            String nomE = controlleur.getNomEmbarcationRunning();
+            Embarcation embarcationCourante = null;
+            try {
+                embarcationCourante = this.getEmbarcationWithName(nomE);
+            } catch (Exception e) {
+                System.out.print(e.getMessage());
+            }
+            this.addInClassement(distance_parcouru, 0, embarcationCourante);
+
             first_arrival = firstArrivalSensor.genererTemps() + chrono.getTemps();
 
             for (int i = 1; i < this.nb_participants; i++) {
                 double randomNum = (float) (0.5 + (3 - 0.5) * rand.nextDouble()) + chrono.getTemps();
-                while(chrono.getTemps() < randomNum) {
+                while (chrono.getTemps() < randomNum) {
                     initializeClassement(distance_parcouru, i, (float) randomNum);
                 }
 
+                //le suivant vient de finir => il faut demander la saisie de son nom à l'interface
+                String nomEquipeSuivante = controlleur.getNomEmbarcationRunning();
+                Embarcation embarcationCouranteSuivante = null;
+                try {
+                    embarcationCouranteSuivante = this.getEmbarcationWithName(nomEquipeSuivante);
+                } catch (Exception e) {
+
+                }
+                this.addInClassement(distance_parcouru, i, embarcationCouranteSuivante);
+
             }
+            this.showClassement(distance_parcouru);
 
         }
         chrono.stop();
+        this.controlleur.finTournoi();
     }
 
     public String getNom() {
@@ -220,6 +249,10 @@ public class Tournoi{
         return metres;
     }
 
+    public float getIntervalle() {
+        return this.intervalle;
+    }
+
     public TypeTournoi getType() {
         return type;
     }
@@ -228,40 +261,77 @@ public class Tournoi{
         return this.concourrants.get(position).getNom();
     }
 
-    public boolean isOk(){
-        return this.concourrants.size() == this.nb_participants;
+    public boolean isOk() throws Exception {
+        if (this.concourrants.size() == this.nb_participants) {
+            return true;
+        } else {
+            throw new Exception("Tournoi non valide");
+        }
+
     }
 
     @Override
     public String toString() {
-        return "Tournoi{" +
-                "nom='" + nom + '\'' +
-                ", lieu='" + lieu + '\'' +
-                ", code='" + code + '\'' +
-                ", metres=" + metres +
-                ", estBarre=" + estBarre +
-                ", type=" + type +
-                ", categorie=" + categorie +
-                ", sexe=" + sexe +
-                ", armature=" + armature +
-                ", concourrants=" + concourrants +
-                '}';
+        return "Tournoi{"
+                + "nom='" + nom + '\''
+                + ", lieu='" + lieu + '\''
+                + ", code='" + code + '\''
+                + ", metres=" + metres
+                + ", estBarre=" + estBarre
+                + ", type=" + type
+                + ", categorie=" + categorie
+                + ", sexe=" + sexe
+                + ", armature=" + armature
+                + ", concourrants=" + concourrants
+                + '}';
     }
 
-    
     //Rajout méthodes pour le controlleur afin de créer ce qui est necéssaire
-    public void creationEmbarcationsWithParticipants (ArrayList<String> infosEmbarcations) {
-        Embarcation e = new Embarcation (infosEmbarcations.get(0), this.getNb_participants_par_embarcation()) ;
-        int departInfosP = 1 ; 
-        for (int i=1;i<this.getNb_participants_par_embarcation();i++) {
-            infosEmbarcations.get(departInfosP) ; 
-            infosEmbarcations.get(departInfosP+1) ;
-            infosEmbarcations.get(departInfosP+2) ; 
+    public void creationEmbarcationsWithParticipants(ArrayList<String> infosEmbarcation) {
+        Embarcation embarcation = new Embarcation(infosEmbarcation.get(0), this.getNb_participants_par_embarcation());
+        int departInfosP = 1;
+        try {
+            for (int i = 0; i < this.getNb_participants_par_embarcation(); i++) {
+                String[] infosDateNaiss = infosEmbarcation.get(departInfosP + 2).split("/");
+
+                LocalDate date = LocalDate.of(Integer.parseInt(infosDateNaiss[2]), Integer.parseInt(infosDateNaiss[1]), Integer.parseInt(infosDateNaiss[0]));
+                Participant p = new Participant(infosEmbarcation.get(departInfosP + 1), infosEmbarcation.get(departInfosP), date);
+
+                embarcation.positionnerParticipant(Integer.parseInt(infosEmbarcation.get(departInfosP + 3)) - 1, p);
+
+                departInfosP = departInfosP + 4;
+            }
+            this.addConcourrant(embarcation);
+        } catch (Exception e) {
+            this.controlleur.erreurSaisieEquipes(e.getMessage());
         }
-        //Rajout à la liste des embarcations 
-        
+
     }
 
+    public Embarcation getEmbarcationWithName(String nomE) throws Exception {
+        Embarcation e = null;
+        for (int i = 0; i < this.concourrants.size(); i++) {
+            if (this.concourrants.get(i).getNom().toUpperCase().equals(nomE.toUpperCase())) {
+                e = this.concourrants.get(i);
+            }
+        }
+
+        if (e == null) {
+            throw new Exception("Equipe inconnue");
+        }
+
+        return e;
+    }
+
+    public ArrayList getNomsEmbarcations() {
+        ArrayList<String> noms = new ArrayList<>();
+        for (int i = 0; i < concourrants.size(); i++) {
+            noms.add(concourrants.get(i).getNom());
+        }
+        return noms;
+    }
+
+    //Partie CSV
     public void generateCSV(String filePath) {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Intervalle, Place, Temps, Nom de l'embarcation\n");
@@ -278,7 +348,7 @@ public class Tournoi{
                     String nomEmbarcation;
                     try {
                         nomEmbarcation = embarcation.getNom();
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         nomEmbarcation = null;
                     }
                     writer.write("" + temps + ',' + place + "," + tempsDeCourse + "," + nomEmbarcation + "\n");
@@ -308,7 +378,7 @@ public class Tournoi{
                     int nbEmbarcations = Integer.parseInt(elements[6]);
                     String typeT = elements[7];
                     TypeTournoi typeTournoi = TypeTournoi.valueOf(typeT);
-                    tournoi = new Tournoi(nomTournoi, lieu, code, distance, nbParticipants, nbEmbarcations, typeTournoi);
+                    tournoi = new Tournoi(nomTournoi, lieu, code, distance, nbParticipants, nbEmbarcations, typeTournoi, null);
                     break;
                 case "EMBARCATION":
                     String nomEmbarcation = elements[1];
@@ -338,7 +408,5 @@ public class Tournoi{
         }
         return tournoi;
     }
-
-
 
 }
