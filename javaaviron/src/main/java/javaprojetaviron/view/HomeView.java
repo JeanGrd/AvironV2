@@ -1,5 +1,6 @@
 package javaprojetaviron.view;
 
+import java.util.ArrayList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -15,7 +16,7 @@ import javaprojetaviron.controller.ControllerAppli;
  * La classe HomeView représente l'interface d'accueil de l'application 
  * @author PaulineVarin
  */
-public class HomeView {
+public class HomeView extends MotherView {
     //Controlleur à transmettre
     private ControllerAppli controlleurVue ; 
     
@@ -83,7 +84,20 @@ public class HomeView {
         
         return scene ; 
         
+    } 
+
+    @Override
+    public void sendNomEquipe(String n) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-   
-    
+
+    @Override
+    public void majView(ArrayList<String> infos) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void finTournoi() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

@@ -44,9 +44,6 @@ public class Embarcation{
     }
 
     public void positionnerParticipant (int indice, Participant participant) throws Exception{
-        if (indice == 0) {
-            throw new Exception("L'indice 0 est la position du barreur");
-        }
         if (indice < placementParticipant.size()) {
             if (placementParticipant.get(indice) != null) {
                 throw new Exception("Il y a déjà un autre participant sur la place");
