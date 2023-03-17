@@ -108,9 +108,9 @@ public class Tournoi {
             throw new Exception("Cette embarcation n'a pas la bonne dimension pour ce tournoi");
         }
 
-        if (embarcation.containsBarreur() != this.estBarre) {
+        /*if (embarcation.containsBarreur() != this.estBarre) {
             throw new Exception("Cette embarcation ne contient pas de barreur");
-        }
+        }*/
 
         if (this.concourrants.contains(embarcation)) {
             throw new Exception("embarcation existe déjà");
@@ -154,7 +154,6 @@ public class Tournoi {
 
         classement.get(intervalle).put(position, pair);
     }
-
     public void showClassement(float intervalle) throws Exception {
         ArrayList<String> infosC = new ArrayList<>();
         if (classement.containsKey(intervalle)) {
@@ -163,22 +162,21 @@ public class Tournoi {
                 int position = entry.getKey();
                 Embarcation embarcation = entry.getValue().getKey();
                 float valeur = entry.getValue().getValue();
-
+                
                 infosC.add(Integer.toString(position + 1) + "-" + embarcation.getNom());
-
                 this.controlleur.sendInformationsToView(infosC);
+                
                 System.out.println("Position: " + (position + 1) + ", Embarcation: " + embarcation + ", Valeur: " + valeur);
             }
         } else {
             throw new Exception("Intervalle " + intervalle + " non trouvée dans le classement.");
         }
     }
-
+    
     public void running() throws Exception {
-        try {
-            this.isOk();
-        } catch (Exception e) {
-            controlleur.erreurSaisieAlerte(e.getMessage());
+
+        if (!this.isOk()) {
+            throw new Exception("Tournoi non valide");
         }
 
         Chronometre chrono = new Chronometre();
@@ -190,15 +188,15 @@ public class Tournoi {
         float distance_parcouru = 0f;
         float first_arrival = firstArrivalSensor.genererTemps();
 
-        while (distance_parcouru < metres) {
-            while (chrono.getTemps() < first_arrival) {
+        while(distance_parcouru < this.metres) {
+            while(chrono.getTemps() < first_arrival){
                 //System.out.println(first_arrival);
                 Thread.yield(); // permet à d'autres threads de s'exécuter
             }
 
             distance_parcouru += intervalle;
             initializeClassement(distance_parcouru, 0, first_arrival);
-
+            
             //Le premier vient d'arriver => on doit demander la saisie du nom de la 1ère équipe
             String nomE = controlleur.getNomEmbarcationRunning();
             Embarcation embarcationCourante = null;
@@ -208,13 +206,15 @@ public class Tournoi {
                 System.out.print(e.getMessage());
             }
             this.addInClassement(distance_parcouru, 0, embarcationCourante);
+    
             first_arrival = firstArrivalSensor.genererTemps() + chrono.getTemps();
 
-            for (int i = 1; i < nb_participants; i++) {
+            for (int i = 1; i < this.nb_participants; i++) {
                 double randomNum = (float) (0.5 + (3 - 0.5) * rand.nextDouble()) + chrono.getTemps();
-                while (chrono.getTemps() < randomNum) {
+                while(chrono.getTemps() < randomNum) {
                     initializeClassement(distance_parcouru, i, (float) randomNum);
                 }
+                
                 //le suivant vient de finir => il faut demander la saisie de son nom à l'interface
                 String nomEquipeSuivante = controlleur.getNomEmbarcationRunning();
                 Embarcation embarcationCouranteSuivante = null;
@@ -224,12 +224,15 @@ public class Tournoi {
 
                 }
                 this.addInClassement(distance_parcouru, i, embarcationCouranteSuivante);
+
             }
             this.showClassement(distance_parcouru);
+
         }
         chrono.stop();
         this.controlleur.finTournoi();
     }
+    
 
     public String getNom() {
         return nom;
@@ -270,18 +273,18 @@ public class Tournoi {
 
     @Override
     public String toString() {
-        return "Tournoi{"
-                + "nom='" + nom + '\''
-                + ", lieu='" + lieu + '\''
-                + ", code='" + code + '\''
-                + ", metres=" + metres
-                + ", estBarre=" + estBarre
-                + ", type=" + type
-                + ", categorie=" + categorie
-                + ", sexe=" + sexe
-                + ", armature=" + armature
-                + ", concourrants=" + concourrants
-                + '}';
+        return "Tournoi{" +
+                "nom='" + nom + '\'' +
+                ", lieu='" + lieu + '\'' +
+                ", code='" + code + '\'' +
+                ", metres=" + metres +
+                ", estBarre=" + estBarre +
+                ", type=" + type +
+                ", categorie=" + categorie +
+                ", sexe=" + sexe +
+                ", armature=" + armature +
+                ", concourrants=" + concourrants +
+                '}';
     }
 
     //Rajout méthodes pour le controlleur afin de créer ce qui est necéssaire
