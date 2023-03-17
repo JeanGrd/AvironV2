@@ -1,11 +1,15 @@
 package javaprojetaviron.model;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import javafx.util.Pair;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import javaprojetaviron.controller.ControllerAppli;
 
 public class Tournoi {
@@ -25,7 +29,6 @@ public class Tournoi {
     private Armature armature;
     private final MaxSizeArrayList<Embarcation> concourrants;
     private final Map<Float, Map<Integer, Pair<Embarcation, Float>>> classement;
-    private Thread thread;
 
     public int getNb_participants_par_embarcation() {
         return nb_participants_par_embarcation;
@@ -89,7 +92,6 @@ public class Tournoi {
             this.armature = Armature.POINTE;
         }
         this.estBarre = code.contains("+");
-
     }
 
     public void addConcourrant(Embarcation embarcation) throws Exception {
@@ -106,9 +108,10 @@ public class Tournoi {
             throw new Exception("Cette embarcation n'a pas la bonne dimension pour ce tournoi");
         }
 
-        /*if (embarcation.containsBarreur() != this.estBarre) {
+        if (embarcation.containsBarreur() != this.estBarre) {
             throw new Exception("Cette embarcation ne contient pas de barreur");
-        }*/
+        }
+
         if (this.concourrants.contains(embarcation)) {
             throw new Exception("embarcation existe déjà");
         }
@@ -143,7 +146,7 @@ public class Tournoi {
 
         // Remplacer la valeur null par le nom de l'embarcation si elle est null
         if (classement.get(intervalle).get(position) != null) {
-            pair = classement.get(intervalle).get(position);            
+            pair = classement.get(intervalle).get(position);
             if (pair.getKey() == null) {
                 pair = new Pair<Embarcation, Float>(embarcation, pair.getValue());
             }
@@ -153,17 +156,17 @@ public class Tournoi {
     }
 
     public void showClassement(float intervalle) throws Exception {
-        ArrayList<String> infosC = new ArrayList<>() ; 
+        ArrayList<String> infosC = new ArrayList<>();
         if (classement.containsKey(intervalle)) {
             System.out.println("classement de la course " + intervalle + ":");
             for (Map.Entry<Integer, Pair<Embarcation, Float>> entry : classement.get(intervalle).entrySet()) {
                 int position = entry.getKey();
                 Embarcation embarcation = entry.getValue().getKey();
                 float valeur = entry.getValue().getValue();
-                
-                infosC.add(Integer.toString(position + 1)+"-"+embarcation.getNom()) ; 
-    
-                this.controlleur.sendInformationsToView(infosC) ; 
+
+                infosC.add(Integer.toString(position + 1) + "-" + embarcation.getNom());
+
+                this.controlleur.sendInformationsToView(infosC);
                 System.out.println("Position: " + (position + 1) + ", Embarcation: " + embarcation + ", Valeur: " + valeur);
             }
         } else {
@@ -225,7 +228,7 @@ public class Tournoi {
             this.showClassement(distance_parcouru);
         }
         chrono.stop();
-        this.controlleur.finTournoi() ; 
+        this.controlleur.finTournoi();
     }
 
     public String getNom() {
@@ -283,7 +286,7 @@ public class Tournoi {
 
     //Rajout méthodes pour le controlleur afin de créer ce qui est necéssaire
     public void creationEmbarcationsWithParticipants(ArrayList<String> infosEmbarcation) {
-        Embarcation embarcation = new Embarcation(infosEmbarcation.get(0), this.getNb_participants_par_embarcation(), this.estBarre);
+        Embarcation embarcation = new Embarcation(infosEmbarcation.get(0), this.getNb_participants_par_embarcation());
         int departInfosP = 1;
         try {
             for (int i = 0; i < this.getNb_participants_par_embarcation(); i++) {
@@ -292,11 +295,7 @@ public class Tournoi {
                 LocalDate date = LocalDate.of(Integer.parseInt(infosDateNaiss[2]), Integer.parseInt(infosDateNaiss[1]), Integer.parseInt(infosDateNaiss[0]));
                 Participant p = new Participant(infosEmbarcation.get(departInfosP + 1), infosEmbarcation.get(departInfosP), date);
 
-                if (Integer.parseInt(infosEmbarcation.get(departInfosP + 3)) == 0 && this.estBarre) {
-                    embarcation.putBarreur(p);
-                } else {
-                    embarcation.positionnerParticipant(Integer.parseInt(infosEmbarcation.get(departInfosP + 3)) - 1, p);
-                }
+                embarcation.positionnerParticipant(Integer.parseInt(infosEmbarcation.get(departInfosP + 3)) - 1, p);
 
                 departInfosP = departInfosP + 4;
             }
@@ -321,12 +320,12 @@ public class Tournoi {
 
         return e;
     }
-    
-    public ArrayList getNomsEmbarcations () {
-        ArrayList<String> noms = new ArrayList<>() ; 
-        for(int i=0;i<concourrants.size();i++) {
-            noms.add(concourrants.get(i).getNom()) ; 
+
+    public ArrayList getNomsEmbarcations() {
+        ArrayList<String> noms = new ArrayList<>();
+        for (int i = 0; i < concourrants.size(); i++) {
+            noms.add(concourrants.get(i).getNom());
         }
-        return noms ; 
+        return noms;
     }
 }

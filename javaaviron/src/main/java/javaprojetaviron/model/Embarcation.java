@@ -7,7 +7,6 @@ public class Embarcation{
     private float vitesse;
     private float cadence;
     private int sizeEmbarcation;
-    private boolean barreurExiste ; 
     private ArrayList<Participant> placementParticipant;
 
     public float getVitesse() {
@@ -30,10 +29,9 @@ public class Embarcation{
         return nom;
     }
 
-    public Embarcation (String nom, int sizeEmbarcation, boolean existenceBarreur){
+    public Embarcation (String nom, int sizeEmbarcation){
         this.nom = nom;
         this.sizeEmbarcation = sizeEmbarcation;
-        this.barreurExiste = existenceBarreur ; 
         this.placementParticipant = new ArrayList<Participant>(this.sizeEmbarcation);
         for (int i = 0; i < this.sizeEmbarcation; i++) {
             placementParticipant.add(null);
@@ -46,9 +44,6 @@ public class Embarcation{
     }
 
     public void positionnerParticipant (int indice, Participant participant) throws Exception{
-        /*if (indice == 0) {
-            throw new Exception("L'indice 0 est la position du barreur");
-        }*/
         if (indice < placementParticipant.size()) {
             if (placementParticipant.get(indice) != null) {
                 throw new Exception("Il y a déjà un autre participant sur la place");
@@ -65,7 +60,7 @@ public class Embarcation{
     }
 
     public void removeBarreur(){
-        placementParticipant.remove(0);
+        placementParticipant.set(0, null);
     }
 
     public boolean containsBarreur() {
@@ -90,7 +85,5 @@ public class Embarcation{
         }
         return true;
     }
-
-    
 
 }
