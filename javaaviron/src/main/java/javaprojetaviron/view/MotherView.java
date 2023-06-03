@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javaprojetaviron.controller.ControllerAppli;
 
@@ -53,8 +55,22 @@ public abstract class MotherView {
         
         Scene s = new Scene(root, 300,300) ; 
         popupwindow.setScene(s);
+        
+        //Positionnement
+        //Recuperation de la taille de l'écran
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        
+        //Positionnement de la fenetre
+        System.out.println(primaryScreenBounds.getWidth()) ; 
+        if (primaryScreenBounds.getWidth()>= 1920) {
+           popupwindow.setX(primaryScreenBounds.getWidth()/2);
+        }
+        else {
+            popupwindow.setX(primaryScreenBounds.getWidth()/1.5);
+        }
+        popupwindow.setY(primaryScreenBounds.getHeight()/10);
+        
         popupwindow.showAndWait();
- 
     }
     
     public void cheminFichier(ControllerAppli c, String contexte) {
@@ -64,7 +80,7 @@ public abstract class MotherView {
         TextField nomFichier = new TextField() ; 
         
         Label cheminL= new Label("Merci de saisir le chemin ");
-        Label nomFichierL = new Label("Merci de saisir le nom du ficier") ; 
+        Label nomFichierL = new Label("Merci de saisir le nom du fichier") ; 
         
         Button valider = new Button("Valider") ; 
         
