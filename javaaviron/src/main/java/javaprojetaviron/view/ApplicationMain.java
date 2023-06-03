@@ -9,6 +9,8 @@ package javaprojetaviron.view;
  * @author PaulineVarin
  */
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javaprojetaviron.controller.ControllerAppli;
 import javaprojetaviron.model.Tournoi;
@@ -27,6 +29,15 @@ public class ApplicationMain extends Application{
         HomeView homescene = new HomeView() ; 
         homescene.setControlleurVue(c);
         primaryStage.setScene(homescene.creationScene());
+        
+        //Positionnement
+        //Recuperation de la taille de l'écran
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        
+        //Positionnement de la fenetre
+        primaryStage.setX(primaryScreenBounds.getWidth()/25);
+        primaryStage.setY(primaryScreenBounds.getHeight()/10);
+        
         primaryStage.show();
     }
     
