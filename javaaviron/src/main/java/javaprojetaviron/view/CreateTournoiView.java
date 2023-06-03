@@ -205,7 +205,7 @@ public class CreateTournoiView extends MotherView {
         //Creation de la scene principale  
         this.root.setAlignment(Pos.CENTER);
         this.root.getChildren().addAll(rootTitre,rootBox, rootBouton) ; 
-        Scene scene = new Scene(root, 1000,600); 
+        Scene scene = new Scene(root, 800,600); 
 
         //Liaison de la scene et du controleur
         this.controlleurVue.setVueTournoi(this);

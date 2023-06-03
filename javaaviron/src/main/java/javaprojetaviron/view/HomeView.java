@@ -87,7 +87,7 @@ public class HomeView extends MotherView {
         //Creation de la scene principale 
         this.root.setAlignment(Pos.CENTER);
         this.root.getChildren().addAll(rootV, rootH);
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, 800, 600);
 
         return scene;
 
