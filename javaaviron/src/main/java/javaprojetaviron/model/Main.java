@@ -1,11 +1,12 @@
 package javaprojetaviron.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Tournoi test = new Tournoi("test","Narbonne", "FS5X+", 75, 25, 4, TypeTournoi.COURSE_LIGNE, null);
+        Tournoi test = new Tournoi("test","Narbonne", "FS5X+", 25, 25, 2, TypeTournoi.COURSE_CONTRE_LA_MONTRE, null);
 
         LocalDate date = LocalDate.of(2000, 10, 26);
 
@@ -44,6 +45,43 @@ public class Main {
         emb4.positionnerParticipant(4, p4);
         emb4.putBarreur(p1);
 
+        ArrayList<Embarcation> e = new ArrayList<>();
+
+        e.add(emb1);
+        e.add(emb2);
+        e.add(emb3);
+        e.add(emb4);
+        e.add(emb1);
+        e.add(emb2);
+        e.add(emb3);
+        e.add(emb4);
+
+        BracketV2 b = new BracketV2(e);
+
+        System.out.println(b.getTournamentsFromRound(1));
+
+        b.running(test);
+        b.addWinner(1, emb2);
+        b.running(test);
+        b.addWinner(1, emb3);
+        System.out.println(b.getTournamentsFromRound(1));
+        b.running(test);
+        b.addWinner(1, emb1);
+        b.running(test);
+        b.addWinner(1, emb4);
+        b.running(test);
+        b.addWinner(2, emb2);
+        b.showBracket();
+        b.running(test);
+        b.addWinner(2, emb1);
+        b.running(test);
+        b.addWinner(3, emb1);
+        b.showBracket();
+
+        System.out.println(b.getWinner());
+
+        /*
+
         test.addConcourrant(emb1);
         test.addConcourrant(emb2);
         test.addConcourrant(emb3);
@@ -51,24 +89,19 @@ public class Main {
 
         System.out.println(test.isOk());
 
-        //test.running();
+        test.running();
 
-        //test.addInClassement(75, 0, emb3);
-        //test.addInClassement(75, 0, emb2);
+        test.showClassement(25);
+        test.showClassement(50);
 
-        //test.showClassement(25);
-        //test.showClassement(75);
 
-        //test.generateCSV("test");
+        test.addInClassement(75, 1, emb3);
+        test.addInClassement(75, 1, emb2);
 
-        Tournoi MyTournament = Tournoi.readTournoi("test copy 2.csv",null);
+        test.showClassement(25);
+        test.showClassement(75);
 
-        MyTournament.running();
-
-        MyTournament.showClassement(25);
-        MyTournament.showClassement(50);
-        MyTournament.showClassement(75);
-
-        MyTournament.generateCSV("bonjour.csv");
+        test.generateCSV("test");
+*/
     }
 }

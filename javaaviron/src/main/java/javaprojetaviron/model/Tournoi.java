@@ -10,9 +10,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javaprojetaviron.controller.ControllerAppli;
 
-public class Tournoi {
+public class Tournoi implements Cloneable {
 
     private ControllerAppli controlleur;
     private final int nb_participants;
@@ -27,8 +29,8 @@ public class Tournoi {
     private Categorie categorie;
     private Sexe sexe;
     private Armature armature;
-    private final MaxSizeArrayList<Embarcation> concourrants;
-    private final Map<Float, Map<Integer, Pair<Embarcation, Float>>> classement;
+    private MaxSizeArrayList<Embarcation> concourrants;
+    private Map<Float, Map<Integer, Pair<Embarcation, Float>>> classement;
 
     public int getNb_participants_par_embarcation() {
         return nb_participants_par_embarcation;
@@ -129,6 +131,30 @@ public class Tournoi {
 
     }
 
+    private Map<Float, Map<Integer, Pair<Embarcation, Float>>> sortClassement(Map<Float, Map<Integer, Pair<Embarcation, Float>>> classement) {
+        Map<Float, Map<Integer, Pair<Embarcation, Float>>> sortedClassement = new LinkedHashMap<>();
+
+        for (Map.Entry<Float, Map<Integer, Pair<Embarcation, Float>>> entry : classement.entrySet()) {
+            Map<Integer, Pair<Embarcation, Float>> sortedInnerMap = entry.getValue().entrySet().stream()
+                    .sorted(Map.Entry.<Integer, Pair<Embarcation, Float>>comparingByValue(Comparator.comparing(Pair::getValue)))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (e1, e2) -> e1,
+                            LinkedHashMap::new
+                    ));
+            sortedClassement.put(entry.getKey(), sortedInnerMap);
+        }
+
+        return sortedClassement;
+    }
+
+
+
+    public void clearConcourrants() {
+        this.concourrants.clear();
+    }
+
     private void initializeClassement(float intervalle, int position, float temps) {
         if (!classement.containsKey(intervalle)) {
             classement.put(intervalle, new HashMap<Integer, Pair<Embarcation, Float>>());
@@ -163,9 +189,6 @@ public class Tournoi {
                 Embarcation embarcation = entry.getValue().getKey();
                 float valeur = entry.getValue().getValue();
 
-                infosC.add(Integer.toString(position + 1) + "-" + embarcation.getNom());
-                this.controlleur.sendInformationsToView(infosC);
-
                 System.out.println("Position: " + (position + 1) + ", Embarcation: " + embarcation + ", Valeur: " + valeur);
             }
         } else {
@@ -174,6 +197,70 @@ public class Tournoi {
     }
 
     public void running() throws Exception {
+        switch (this.type) {
+            case COURSE_LIGNE -> runningCourseLigne();
+            case COURSE_CONTRE_LA_MONTRE -> runningCourseContreLaMontre();
+            default -> throw new Exception("Type de course inconnu : " + this.type);
+        }
+    }
+
+    private void runningCourseContreLaMontre() throws Exception {
+        if (!this.isOk()) {
+            throw new Exception("Tournoi non valide");
+        }
+
+        Chronometre chrono = new Chronometre();
+        List<Thread> threads = new ArrayList<>();  // Liste pour stocker les références aux threads
+
+        chrono.running();
+        for (int i = 0; i < this.concourrants.size(); i++) {
+            Embarcation c = this.concourrants.get(i);
+            Thread t = new Thread(() -> courir(c));
+            t.start();
+            threads.add(t);
+            if (i < this.concourrants.size() - 1) {  // Si ce n'est pas le dernier thread
+                while (chrono.getTemps() < 15) {
+                    //System.out.println(first_arrival);
+                    Thread.yield(); // permet à d'autres threads de s'exécuter
+                }
+            }
+        }
+
+        // Attendre que tous les threads se terminent
+        for (Thread t : threads) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        chrono.stop();
+        this.classement = sortClassement(this.classement);
+    }
+
+
+    private void courir(Embarcation e) {
+        Chronometre chrono = new Chronometre();
+        Senseur sensor = new Senseur(intervalle);
+
+        float distance_parcouru = 0f;
+
+        chrono.running();
+        while (distance_parcouru < this.metres) {
+            float dist = sensor.genererTemps();
+            while (chrono.getTemps() < dist) {
+                //System.out.println(first_arrival);
+                Thread.yield(); // permet à d'autres threads de s'exécuter
+            }
+            distance_parcouru += intervalle;
+            initializeClassement(distance_parcouru, concourrants.indexOf(e), chrono.getTemps());
+        }
+        chrono.stop();
+
+    }
+
+    public void runningCourseLigne() throws Exception {
 
         if (!this.isOk()) {
             throw new Exception("Tournoi non valide");
@@ -198,13 +285,8 @@ public class Tournoi {
             initializeClassement(distance_parcouru, 0, first_arrival);
 
             //Le premier vient d'arriver => on doit demander la saisie du nom de la 1ère équipe
-            String nomE = controlleur.getNomEmbarcationRunning();
+            String nomE = "First";
             Embarcation embarcationCourante = null;
-            try {
-                embarcationCourante = this.getEmbarcationWithName(nomE);
-            } catch (Exception e) {
-                System.out.print(e.getMessage());
-            }
             this.addInClassement(distance_parcouru, 0, embarcationCourante);
 
             first_arrival = firstArrivalSensor.genererTemps() + chrono.getTemps();
@@ -216,7 +298,7 @@ public class Tournoi {
                 }
 
                 //le suivant vient de finir => il faut demander la saisie de son nom à l'interface
-                String nomEquipeSuivante = controlleur.getNomEmbarcationRunning();
+                String nomEquipeSuivante = "Second";
                 Embarcation embarcationCouranteSuivante = null;
                 try {
                     embarcationCouranteSuivante = this.getEmbarcationWithName(nomEquipeSuivante);
@@ -230,8 +312,26 @@ public class Tournoi {
 
         }
         chrono.stop();
-        this.controlleur.finTournoi();
     }
+
+    public Embarcation getWinner() {
+        // Trouver la dernière intervalle (max clé dans la Map)
+        Float derniereIntervalle = Collections.max(classement.keySet());
+
+        // Récupérer le classement pour cette intervalle
+        Map<Integer, Pair<Embarcation, Float>> classementDerniereIntervalle = classement.get(derniereIntervalle);
+
+        // Récupérer l'embarcation qui a gagné (position 0)
+        Pair<Embarcation, Float> pairGagnant = classementDerniereIntervalle.get(0);
+
+        if(pairGagnant != null && pairGagnant.getKey() != null) {
+            return pairGagnant.getKey();
+        }
+        else {
+            return null;
+        }
+    }
+
 
     public String getNom() {
         return nom;
@@ -257,8 +357,12 @@ public class Tournoi {
         return type;
     }
 
-    public String getConcourrants(int position) {
+    public String getConcourrant(int position) {
         return this.concourrants.get(position).getNom();
+    }
+
+    public MaxSizeArrayList<Embarcation> getConcourrants() {
+        return this.concourrants;
     }
 
     public boolean isOk() throws Exception {
@@ -351,7 +455,7 @@ public class Tournoi {
                     } catch (Exception e) {
                         nomEmbarcation = null;
                     }
-                    String placement = Integer.toString(place+1) ; 
+                    String placement = Integer.toString(place+1) ;
                     writer.write("" + temps + ',' + placement + "," + tempsDeCourse + "," + nomEmbarcation + "\n");
                 }
             }
@@ -410,4 +514,18 @@ public class Tournoi {
         return tournoi;
     }
 
+    @Override
+    public Tournoi clone() {
+        try {
+            Tournoi cloned = (Tournoi) super.clone();
+            cloned.clearConcourrants();
+            cloned.controlleur = new ControllerAppli(); //Assuming default constructor. Replace with actual cloning method if needed.
+            cloned.concourrants = new MaxSizeArrayList<>(this.nb_participants); // Assuming copy constructor. Replace with actual cloning method if needed.
+            cloned.classement = new HashMap<>(this.classement); // Assuming HashMap's clone method will work. Replace with actual deep clone if needed.
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Can't happen as we implement Cloneable
+        }
+    }
 }
+
