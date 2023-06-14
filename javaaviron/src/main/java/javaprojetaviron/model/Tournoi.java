@@ -22,13 +22,16 @@ public class Tournoi implements Cloneable {
     private final String nom;
     private final String lieu;
     private String code;
+
+    private float startTimeInterval = 15f;
+
     private final float metres;
     private final float intervalle;
     private boolean estBarre;
-    private final TypeTournoi type;
-    private Categorie categorie;
-    private Sexe sexe;
-    private Armature armature;
+    private final TournamentType type;
+    private Category categorie;
+    private Gender sexe;
+    private Rigging armature;
     private MaxSizeArrayList<Embarcation> concourrants;
     private Map<Float, Map<Integer, Pair<Embarcation, Float>>> classement;
 
@@ -40,11 +43,11 @@ public class Tournoi implements Cloneable {
         return estBarre;
     }
 
-    public Categorie getCategorie() {
-        return categorie;
+    public Category getCategorie() {
+        return this.categorie;
     }
 
-    public Sexe getSexe() {
+    public Gender getGender() {
         return sexe;
     }
 
@@ -52,11 +55,11 @@ public class Tournoi implements Cloneable {
         return nb_participants;
     }
 
-    public Armature getArmature() {
+    public Rigging getArmature() {
         return armature;
     }
 
-    public Tournoi(String nom, String lieu, String code, float metres, float intervalle, int nb_participants, TypeTournoi type, ControllerAppli c) throws Exception {
+    public Tournoi(String nom, String lieu, String code, float metres, float intervalle, int nb_participants, TournamentType type, ControllerAppli c) throws Exception {
         this.controlleur = c;
         this.decodeCode(code);
         this.nom = nom;
@@ -70,7 +73,7 @@ public class Tournoi implements Cloneable {
             throw new Exception("Intervalle incorrecte");
         }
 
-        if (metres > this.categorie.getNb_max_m()) {
+        if (metres > this.categorie.getMaxDistanceM()) {
             throw new Exception("Nombre de metres donné n'appartient pas à la catégorie spécifié dans le code");
         }
 
@@ -85,13 +88,13 @@ public class Tournoi implements Cloneable {
         }
 
         // Récupération des différentes informations
-        this.sexe = Sexe.getSexe(code.substring(0, 1));
-        this.categorie = Categorie.getCategorie(code.substring(1, 2));
+        this.sexe = Gender.getGender(code.substring(0, 1));
+        this.categorie = Category.getCategory(code.substring(1, 2));
         this.nb_participants_par_embarcation = Integer.parseInt(code.substring(2, 3));
         if (code.contains("X")) {
-            this.armature = Armature.COUPLE;
+            this.armature = Rigging.COUPLE;
         } else {
-            this.armature = Armature.POINTE;
+            this.armature = Rigging.POINTE;
         }
         this.estBarre = code.contains("+");
     }
@@ -102,7 +105,7 @@ public class Tournoi implements Cloneable {
             throw new Exception("Embarcation non terminée");
         }
 
-        if (!embarcation.checkAge(this.categorie.getMax_age())) {
+        if (!embarcation.checkAge(this.categorie.getMaxAge())) {
             throw new Exception("Un participant est hors catégorie");
         }
 
@@ -148,8 +151,6 @@ public class Tournoi implements Cloneable {
 
         return sortedClassement;
     }
-
-
 
     public void clearConcourrants() {
         this.concourrants.clear();
@@ -219,8 +220,7 @@ public class Tournoi implements Cloneable {
             t.start();
             threads.add(t);
             if (i < this.concourrants.size() - 1) {  // Si ce n'est pas le dernier thread
-                while (chrono.getTemps() < 15) {
-                    //System.out.println(first_arrival);
+                while (chrono.getElapsedTime() < this.getStartTimeInterval()) {
                     Thread.yield(); // permet à d'autres threads de s'exécuter
                 }
             }
@@ -242,19 +242,19 @@ public class Tournoi implements Cloneable {
 
     private void courir(Embarcation e) {
         Chronometre chrono = new Chronometre();
-        Senseur sensor = new Senseur(intervalle);
+        Sensor sensor = new Sensor(intervalle);
 
         float distance_parcouru = 0f;
 
         chrono.running();
         while (distance_parcouru < this.metres) {
-            float dist = sensor.genererTemps();
-            while (chrono.getTemps() < dist) {
+            float dist = sensor.generateTime();
+            while (chrono.getElapsedTime() < dist) {
                 //System.out.println(first_arrival);
                 Thread.yield(); // permet à d'autres threads de s'exécuter
             }
             distance_parcouru += intervalle;
-            initializeClassement(distance_parcouru, concourrants.indexOf(e), chrono.getTemps());
+            initializeClassement(distance_parcouru, concourrants.indexOf(e), chrono.getElapsedTime());
         }
         chrono.stop();
 
@@ -267,16 +267,16 @@ public class Tournoi implements Cloneable {
         }
 
         Chronometre chrono = new Chronometre();
-        Senseur firstArrivalSensor = new Senseur(intervalle);
+        Sensor firstArrivalSensor = new Sensor(intervalle);
         Random rand = new Random();
 
         chrono.running();
 
         float distance_parcouru = 0f;
-        float first_arrival = firstArrivalSensor.genererTemps();
+        float first_arrival = firstArrivalSensor.generateTime();
 
         while (distance_parcouru < this.metres) {
-            while (chrono.getTemps() < first_arrival) {
+            while (chrono.getElapsedTime() < first_arrival) {
                 //System.out.println(first_arrival);
                 Thread.yield(); // permet à d'autres threads de s'exécuter
             }
@@ -289,11 +289,11 @@ public class Tournoi implements Cloneable {
             Embarcation embarcationCourante = null;
             this.addInClassement(distance_parcouru, 0, embarcationCourante);
 
-            first_arrival = firstArrivalSensor.genererTemps() + chrono.getTemps();
+            first_arrival = firstArrivalSensor.generateTime() + chrono.getElapsedTime();
 
             for (int i = 1; i < this.nb_participants; i++) {
-                double randomNum = (float) (0.5 + (3 - 0.5) * rand.nextDouble()) + chrono.getTemps();
-                while (chrono.getTemps() < randomNum) {
+                double randomNum = (float) (0.5 + (3 - 0.5) * rand.nextDouble()) + chrono.getElapsedTime();
+                while (chrono.getElapsedTime() < randomNum) {
                     initializeClassement(distance_parcouru, i, (float) randomNum);
                 }
 
@@ -353,16 +353,24 @@ public class Tournoi implements Cloneable {
         return this.intervalle;
     }
 
-    public TypeTournoi getType() {
+    public TournamentType getType() {
         return type;
     }
 
     public String getConcourrant(int position) {
-        return this.concourrants.get(position).getNom();
+        return this.concourrants.get(position).getName();
     }
 
     public MaxSizeArrayList<Embarcation> getConcourrants() {
         return this.concourrants;
+    }
+
+    public void setStartTimeInterval(float startTimeInterval) {
+        this.startTimeInterval = startTimeInterval;
+    }
+
+    public float getStartTimeInterval() {
+        return startTimeInterval;
     }
 
     public boolean isOk() throws Exception {
@@ -401,7 +409,7 @@ public class Tournoi implements Cloneable {
                 LocalDate date = LocalDate.of(Integer.parseInt(infosDateNaiss[2]), Integer.parseInt(infosDateNaiss[1]), Integer.parseInt(infosDateNaiss[0]));
                 Participant p = new Participant(infosEmbarcation.get(departInfosP + 1), infosEmbarcation.get(departInfosP), date);
 
-                embarcation.positionnerParticipant(Integer.parseInt(infosEmbarcation.get(departInfosP + 3)) - 1, p);
+                embarcation.positionParticipant(Integer.parseInt(infosEmbarcation.get(departInfosP + 3)) - 1, p);
 
                 departInfosP = departInfosP + 4;
             }
@@ -415,7 +423,7 @@ public class Tournoi implements Cloneable {
     public Embarcation getEmbarcationWithName(String nomE) throws Exception {
         Embarcation e = null;
         for (int i = 0; i < this.concourrants.size(); i++) {
-            if (this.concourrants.get(i).getNom().toUpperCase().equals(nomE.toUpperCase())) {
+            if (this.concourrants.get(i).getName().toUpperCase().equals(nomE.toUpperCase())) {
                 e = this.concourrants.get(i);
             }
         }
@@ -430,7 +438,7 @@ public class Tournoi implements Cloneable {
     public ArrayList getNomsEmbarcations() {
         ArrayList<String> noms = new ArrayList<>();
         for (int i = 0; i < concourrants.size(); i++) {
-            noms.add(concourrants.get(i).getNom());
+            noms.add(concourrants.get(i).getName());
         }
         return noms;
     }
@@ -451,7 +459,7 @@ public class Tournoi implements Cloneable {
                     Float tempsDeCourse = pair.getValue();
                     String nomEmbarcation;
                     try {
-                        nomEmbarcation = embarcation.getNom();
+                        nomEmbarcation = embarcation.getName();
                     } catch (Exception e) {
                         nomEmbarcation = null;
                     }
@@ -482,7 +490,7 @@ public class Tournoi implements Cloneable {
                     int nbParticipants = Integer.parseInt(elements[5]);
                     int nbEmbarcations = Integer.parseInt(elements[6]);
                     String typeT = elements[7];
-                    TypeTournoi typeTournoi = TypeTournoi.valueOf(typeT);
+                    TournamentType typeTournoi = TournamentType.valueOf(typeT);
                     tournoi = new Tournoi(nomTournoi, lieu, code, distance, nbParticipants, nbEmbarcations, typeTournoi, c);
                     break;
                 case "EMBARCATION":
@@ -499,9 +507,9 @@ public class Tournoi implements Cloneable {
                     LocalDate dateNaissance = LocalDate.parse(elements[4], formatter);
                     Participant participant = new Participant(prenom, nom, dateNaissance);
                     if (indexParticipant != 0) {
-                        embarcationCourante.positionnerParticipant(indexParticipant, participant);
+                        embarcationCourante.positionParticipant(indexParticipant, participant);
                     } else {
-                        embarcationCourante.putBarreur(participant);
+                        embarcationCourante.putSteerer(participant);
                     }
                     break;
                 default:

@@ -1,13 +1,26 @@
 package javaprojetaviron.model;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Classe pour gérer les tournois en fonction de la liste des participants et du type de tournoi.
+ */
 public class BracketV2 {
+    // Liste des participants à la compétition
     private ArrayList<Embarcation> participants;
-    private Map<Integer, List<Tournoi>> tournamentsByRound; // Map pour conserver les tournois par round
+    // Structure de données pour stocker les tournois par round
+    private Map<Integer, List<Tournoi>> tournamentsByRound;
+    // Index du tournoi en cours
     private int currentTournamentIndex;
+    // Round en cours
     private int round;
 
+    /**
+     * Constructeur pour la classe BracketV2.
+     * @param participants Liste des participants au tournoi
+     * @throws Exception si le nombre de participants n'est pas pair
+     */
     public BracketV2(ArrayList<Embarcation> participants) throws Exception {
         if(participants.size() % 2 != 0) {
             throw new Exception("Nombre de participants doit être pair");
@@ -18,6 +31,11 @@ public class BracketV2 {
         this.round = 1;
     }
 
+    /**
+     * Méthode pour exécuter un tournoi.
+     * @param tournoiType Type de tournoi à exécuter
+     * @throws Exception si le nombre de participants par tournoi n'est pas de deux
+     */
     public void running(Tournoi tournoiType) throws Exception {
 
         // Vérification du nombre de participants
@@ -32,7 +50,7 @@ public class BracketV2 {
             }
         }
 
-        // Reset si le tour est terminé
+        // Réinitialiser si le tour est terminé
         if (currentTournamentIndex * 2 >= participants.size()) {
             currentTournamentIndex = 0;
             round++;
@@ -52,30 +70,55 @@ public class BracketV2 {
         tournamentsByRound.put(round, tournamentsThisRound); // Ajout des tournois de ce tour à la map
 
         currentTournamentIndex++;
-
     }
 
-    // Méthode pour récupérer la map des tournois par round
+    /**
+     * Méthode pour obtenir la map des tournois par round.
+     * @return la map des tournois par round
+     */
     public Map<Integer, List<Tournoi>> getTournamentsByRound() {
         return tournamentsByRound;
     }
 
+    /**
+     * Méthode pour récupérer les gagnants d'un round spécifique.
+     * @param round le round dont les gagnants sont à récupérer
+     * @return une liste des gagnants du round spécifié
+     */
     private ArrayList<Embarcation> getWinnersFromRound(int round) {
         return new ArrayList<>(tournamentsByRound.get(round).stream().map(Tournoi::getWinner).collect(Collectors.toList()));
     }
 
+    /**
+     * Méthode pour vérifier si le tournoi est terminé.
+     * @return vrai si le tournoi est terminé, faux sinon
+     */
     boolean isFinished() {
         return round > 1 && currentTournamentIndex * 2 >= participants.size();
     }
 
+    /**
+     * Méthode pour obtenir la liste des tournois d'un round spécifique.
+     * @param round le round dont on veut récupérer les tournois
+     * @return une liste des tournois du round spécifié
+     */
     public List<Tournoi> getTournamentsFromRound(int round) {
         return tournamentsByRound.getOrDefault(round, new ArrayList<>());
     }
 
+    /**
+     * Méthode pour ajouter un gagnant à un tournoi spécifique.
+     * @param round le round où le gagnant doit être ajouté
+     * @param e l'embarcation gagnante à ajouter
+     */
     public void addWinner(int round, Embarcation e) {
         this.tournamentsByRound.get(round).get(currentTournamentIndex-1).addInClassement(this.tournamentsByRound.get(round).get(currentTournamentIndex-1).getMetres(), 0, e);
     }
 
+    /**
+     * Méthode pour obtenir le gagnant du tournoi.
+     * @return le nom du gagnant si le tournoi est terminé, sinon un message indiquant que le tournoi n'est pas encore terminé
+     */
     public String getWinner() {
         if(this.isFinished()) {
             // Récupérer les tournois du dernier round terminé
@@ -94,6 +137,9 @@ public class BracketV2 {
         return "Tournament non terminé";
     }
 
+    /**
+     * Méthode pour afficher les détails du tournoi.
+     */
     public void showBracket() {
         // Parcours de tous les rounds
         for (int i = 1; i <= round; i++) {
@@ -131,7 +177,4 @@ public class BracketV2 {
             System.out.println("The tournament is not finished yet.");
         }
     }
-
-
-
 }

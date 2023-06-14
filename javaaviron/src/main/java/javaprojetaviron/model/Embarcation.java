@@ -2,88 +2,97 @@ package javaprojetaviron.model;
 
 import java.util.ArrayList;
 
+/**
+ * Classe représentant une embarcation.
+ */
 public class Embarcation{
-    private String nom;
-    private float vitesse;
-    private float cadence;
+    // Nom de l'embarcation
+    private String name;
+    // Taille de l'embarcation
     private int sizeEmbarcation;
-    private ArrayList<Participant> placementParticipant;
-
-    public float getVitesse() {
-        return vitesse;
-    }
-
-    public float getCadence() {
-        return cadence;
-    }
+    // Placement des participants dans l'embarcation
+    private ArrayList<Participant> participantPlacement;
 
     public int getSizeEmbarcation() {
         return sizeEmbarcation;
     }
 
-    public ArrayList<Participant> getPlacementParticipant() {
-        return placementParticipant;
+    public ArrayList<Participant> getParticipantPlacement() {
+        return participantPlacement;
     }
 
-    public String getNom() {
-        return nom;
+    public String getName() {
+        return name;
     }
 
-    public Embarcation (String nom, int sizeEmbarcation){
-        this.nom = nom;
+    /**
+     * Constructeur pour la classe Embarcation.
+     * @param name Nom de l'embarcation
+     * @param sizeEmbarcation Taille de l'embarcation
+     */
+    public Embarcation (String name, int sizeEmbarcation){
+        this.name = name;
         this.sizeEmbarcation = sizeEmbarcation;
-        this.placementParticipant = new ArrayList<Participant>(this.sizeEmbarcation);
+        this.participantPlacement = new ArrayList<Participant>(this.sizeEmbarcation);
         for (int i = 0; i < this.sizeEmbarcation; i++) {
-            placementParticipant.add(null);
+            participantPlacement.add(null);
         }
     }
 
+    // Méthode pour convertir l'objet Embarcation en une chaîne de caractères
     @Override
     public String toString() {
-        return this.getNom();
+        return this.getName();
     }
 
-    public void positionnerParticipant (int indice, Participant participant) throws Exception{
-        if (indice < placementParticipant.size()) {
-            if (placementParticipant.get(indice) != null) {
+    /**
+     * Méthode pour placer un participant à un indice donné dans l'embarcation.
+     * @param index L'indice à placer le participant
+     * @param participant Le participant à placer
+     */
+    public void positionParticipant (int index, Participant participant) throws Exception{
+        if (index < participantPlacement.size()) {
+            if (participantPlacement.get(index) != null) {
                 throw new Exception("Il y a déjà un autre participant sur la place");
             } else {
-                placementParticipant.set(indice, participant);
+                participantPlacement.set(index, participant);
             }
         } else {
             throw new Exception("L'indice est en dehors de la plage autorisée pour cette liste");
         }
     }
 
-    public void putBarreur(Participant participant){
-        placementParticipant.set(0, participant);
+    // Méthodes pour gérer le barreur de l'embarcation
+    public void putSteerer(Participant participant){
+        participantPlacement.set(0, participant);
     }
 
-    public void removeBarreur(){
-        placementParticipant.set(0, null);
+    public void removeSteerer(){
+        participantPlacement.set(0, null);
     }
 
-    public boolean containsBarreur() {
-        return this.placementParticipant.get(0) != null;
+    public boolean containsSteerer() {
+        return this.participantPlacement.get(0) != null;
     }
 
+    // Méthode pour vérifier si tous les sièges sont occupés, sauf celui du barreur
     public boolean isOk () {
-        for (int i = 1; i < this.placementParticipant.size(); i++) {
-            if (this.placementParticipant.get(i) == null) {
+        for (int i = 1; i < this.participantPlacement.size(); i++) {
+            if (this.participantPlacement.get(i) == null) {
                 return false;
             }
         }
         return true;
     }
 
-    public boolean checkAge (int age_limite) {
-        for (Participant participant : this.placementParticipant) {
+    // Méthode pour vérifier si tous les participants sont en dessous de la limite d'âge spécifiée
+    public boolean checkAge (int ageLimit) {
+        for (Participant participant : this.participantPlacement) {
             if (participant != null) {
-                if (participant.getCurrentAge() > age_limite)
+                if (participant.getCurrentAge() > ageLimit)
                     return false;
             }
         }
         return true;
     }
-
 }

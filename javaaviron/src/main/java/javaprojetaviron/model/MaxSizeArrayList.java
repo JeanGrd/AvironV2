@@ -1,5 +1,4 @@
 package javaprojetaviron.model;
-
 import java.util.ArrayList;
 
 public class MaxSizeArrayList<E> extends ArrayList<E> {
