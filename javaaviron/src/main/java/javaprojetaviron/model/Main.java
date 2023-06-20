@@ -56,7 +56,7 @@ public class Main {
         e.add(emb3);
         e.add(emb4);
 
-        BracketV2 b = new BracketV2(e);
+        Bracket b = new Bracket(e);
 
         System.out.println(b.getTournamentsFromRound(1));
 
