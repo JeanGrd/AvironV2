@@ -1,7 +1,7 @@
 package javaprojetaviron.controller;
 import java.util.ArrayList;
 import javafx.scene.control.Alert;
-import javaprojetaviron.model.TournamentType;
+import javaprojetaviron.model.TypeTournoi;
 import javaprojetaviron.model.Tournoi ;   
 import javaprojetaviron.view.MotherView;
 
@@ -51,13 +51,13 @@ public class ControllerAppli {
     
     public void getInformationsToModelTournoi (ArrayList<String> infos) {
         this.resReponse = true ; 
-        TournamentType typeTournoiC ;
+        TypeTournoi typeTournoiC ;
            
         if(infos.get(3)=="COURSE CONTRE LA MONTRE") {
-            typeTournoiC = TournamentType.COURSE_CONTRE_LA_MONTRE ;
+            typeTournoiC = TypeTournoi.COURSE_CONTRE_LA_MONTRE ;
         }
         else {
-            typeTournoiC = TournamentType.COURSE_LIGNE ;
+            typeTournoiC = TypeTournoi.COURSE_LIGNE ;
         }
         
         try {

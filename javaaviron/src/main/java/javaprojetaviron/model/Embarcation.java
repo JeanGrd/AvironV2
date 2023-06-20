@@ -63,15 +63,15 @@ public class Embarcation{
     }
 
     // Méthodes pour gérer le barreur de l'embarcation
-    public void putSteerer(Participant participant){
+    public void putBarreur(Participant participant){
         participantPlacement.set(0, participant);
     }
 
-    public void removeSteerer(){
+    public void removeBarreur(){
         participantPlacement.set(0, null);
     }
 
-    public boolean containsSteerer() {
+    public boolean containsBarreur() {
         return this.participantPlacement.get(0) != null;
     }
 

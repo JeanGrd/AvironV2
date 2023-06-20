@@ -5,7 +5,7 @@ package javaprojetaviron.model;
  */
 public class Chronometre {
     // Temps enregistré par le chronomètre en secondes
-    private float elapsedTime;
+    private float temps;
     // Thread pour gérer le chronomètre
     private Thread thread;
 
@@ -22,7 +22,7 @@ public class Chronometre {
                     // Calcul du temps écoulé en millisecondes
                     long elapsedMillis = System.currentTimeMillis() - startTime;
                     // Convertir en secondes
-                    elapsedTime = elapsedMillis / 1000f;
+                    temps = elapsedMillis / 1000f;
                 }
             }
         });
@@ -42,7 +42,7 @@ public class Chronometre {
      * Méthode pour obtenir le temps enregistré par le chronomètre.
      * @return le temps enregistré en secondes
      */
-    public float getElapsedTime() {
-        return elapsedTime;
+    public float getTemps() {
+        return temps;
     }
 }

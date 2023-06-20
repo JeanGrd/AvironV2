@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Tournoi test = new Tournoi("test","Narbonne", "FS5X+", 25, 25, 2, TournamentType.COURSE_LIGNE, null);
+        Tournoi test = new Tournoi("test","Narbonne", "FS5X+", 25, 25, 2, TypeTournoi.COURSE_LIGNE, null);
 
         LocalDate date = LocalDate.of(2000, 10, 26);
 
@@ -22,28 +22,28 @@ public class Main {
         emb1.positionParticipant(2, p2);
         emb1.positionParticipant(3, p3);
         emb1.positionParticipant(4, p4);
-        emb1.putSteerer(p1);
+        emb1.putBarreur(p1);
 
         Embarcation emb2 = new Embarcation("Jean", 5);
         emb2.positionParticipant(1, p1);
         emb2.positionParticipant(2, p2);
         emb2.positionParticipant(3, p3);
         emb2.positionParticipant(4, p4);
-        emb2.putSteerer(p1);
+        emb2.putBarreur(p1);
 
         Embarcation emb3 = new Embarcation("Ana", 5);
         emb3.positionParticipant(1, p1);
         emb3.positionParticipant(2, p2);
         emb3.positionParticipant(3, p3);
         emb3.positionParticipant(4, p4);
-        emb3.putSteerer(p1);
+        emb3.putBarreur(p1);
 
         Embarcation emb4 = new Embarcation("Looser", 5);
         emb4.positionParticipant(1, p1);
         emb4.positionParticipant(2, p2);
         emb4.positionParticipant(3, p3);
         emb4.positionParticipant(4, p4);
-        emb4.putSteerer(p1);
+        emb4.putBarreur(p1);
 
         ArrayList<Embarcation> e = new ArrayList<>();
 

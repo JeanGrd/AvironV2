@@ -5,14 +5,14 @@ import java.util.Random;
 /**
  * Classe représentant un senseur dans le système.
  */
-public class Sensor {
+public class Senseur {
     private float distance;
 
     /**
      * Constructeur pour la classe Sensor.
      * @param distance La distance à parcourir
      */
-    public Sensor(float distance) {
+    public Senseur(float distance) {
         this.distance = distance;
     }
 

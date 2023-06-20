@@ -3,20 +3,20 @@ package javaprojetaviron.model;
 /**
  * Enumération pour les sexes possibles d'un participant.
  */
-public enum Gender {
+public enum Sexe {
 
-    FEMALE, MALE;
+    FEMME, HOMME;
 
     /**
      * Méthode pour obtenir le sexe correspondant à une chaîne de caractères.
      * @param type La chaîne de caractères représentant le sexe ("F" pour femme, "H" pour homme)
      * @return L'objet Gender correspondant, ou null si la chaîne ne correspond à aucun sexe
      */
-    public static Gender getGender(String type){
+    public static Sexe getSexe(String type){
         if (type.equals("F")) {
-            return Gender.FEMALE;
+            return Sexe.FEMME;
         } else if (type.equals("H")) {
-            return Gender.MALE;
+            return Sexe.HOMME;
         } else {
             return null;
         }
